@@ -11,21 +11,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -58,17 +56,34 @@ fun Profile() {
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth()
-                .padding(56.dp)
-                .verticalScroll(state = rememberScrollState())
+                .verticalScroll(state = rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            Icon(
+            val (author, setAuthor) = remember { mutableStateOf("") }
+
+            Image(
                 painter = painterResource(id = R.drawable.ic_launcher_background),
                 contentDescription = null,
-                tint = Color.Unspecified,
                 modifier = Modifier
-                    .fillMaxSize(0.5f)
-                    .clip(shape = CircleShape)
+                    .fillMaxWidth(0.6f)
+                    .fillMaxHeight(0.6f)
+                    .clip(shape = CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = author,
+                onValueChange = setAuthor,
+                maxLines = 1,
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color.White,
+                ),
+                label = {
+                    Text(text = "Author Name")
+                }
             )
 
         }

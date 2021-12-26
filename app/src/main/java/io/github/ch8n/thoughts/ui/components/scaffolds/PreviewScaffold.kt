@@ -5,8 +5,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
 
 @Composable
-fun Preview(content: @Composable () -> Unit) {
-    ThoughtsTheme {
+fun Preview(isDarkTheme: Boolean = true, content: @Composable () -> Unit) {
+    ThoughtsTheme(darkTheme = isDarkTheme) {
         content.invoke()
     }
 }
