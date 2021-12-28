@@ -1,23 +1,35 @@
 package io.github.ch8n.thoughts.data.db
 
 import androidx.room.*
+import io.github.ch8n.thoughts.utils.loremIpsum
 import kotlinx.coroutines.flow.Flow
 import java.util.*
+import kotlin.random.Random
 
 
 @Entity
 data class Poem(
-    @PrimaryKey val uid: Long = UUID.randomUUID().timestamp(),
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     @ColumnInfo val updatedAt: Long = System.currentTimeMillis(),
+    @ColumnInfo val title: String,
     @ColumnInfo val content: String,
-    @ColumnInfo val authorId: Long,
-)
+    @ColumnInfo val authorId: String,
+) {
+    companion object {
+        val fake
+            get() = Poem(
+                title = loremIpsum(10),
+                content = loremIpsum(25),
+                authorId = UUID.randomUUID().toString()
+            )
+    }
+}
 
 @Dao
 interface PoemDao {
 
     @Query("SELECT * FROM Poem WHERE authorId = :authorId ORDER BY updatedAt ASC")
-    fun getAllPoem(authorId: Long): Flow<List<Poem>>
+    fun getAllPoem(authorId: String): Flow<List<Poem>>
 
     @Insert
     fun addPoem(poem: Poem)
@@ -26,6 +38,6 @@ interface PoemDao {
     fun delete(poem: Poem)
 
     @Query("DELETE FROM Poem WHERE authorId = :authorId")
-    fun deleteAllPoem(authorId: Long)
+    fun deleteAllPoem(authorId: String)
 
 }

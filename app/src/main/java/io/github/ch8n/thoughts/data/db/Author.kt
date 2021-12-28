@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity
 data class Author(
-    @PrimaryKey val uid: Long = UUID.randomUUID().timestamp(),
+    @PrimaryKey val uid: String = UUID.randomUUID().toString(),
     @ColumnInfo val name: String,
     @ColumnInfo val avatarUri: String,
 )
