@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import java.io.IOException
 import java.io.OutputStream
 
@@ -83,6 +85,20 @@ fun requestReadWritePermissions() {
         }
     }
 }
+
+fun Context.imageDecoderFromUriCompat(fileUri: Uri): Bitmap {
+    return if (Build.VERSION.SDK_INT < 28) {
+        MediaStore.Images.Media.getBitmap(
+            contentResolver,
+            fileUri
+        )
+    } else {
+
+        val source = ImageDecoder.createSource(contentResolver, fileUri)
+        ImageDecoder.decodeBitmap(source)
+    }
+}
+
 
 fun imagesExternalStorageUriCompat(): Uri {
     return if (isMinSdk29) {
