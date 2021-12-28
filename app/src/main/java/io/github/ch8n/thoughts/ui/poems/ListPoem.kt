@@ -64,7 +64,8 @@ private fun PoemCard(poem: Poem) {
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         backgroundColor = MaterialTheme.colors.background,
-        contentColor = MaterialTheme.colors.onBackground
+        contentColor = MaterialTheme.colors.onBackground,
+        elevation = 8.dp
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(
