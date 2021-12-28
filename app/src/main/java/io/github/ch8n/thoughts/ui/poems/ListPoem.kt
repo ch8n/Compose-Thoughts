@@ -1,5 +1,6 @@
 package io.github.ch8n.thoughts.ui.poems
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,7 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +51,13 @@ fun ListPoem(
 
 @Composable
 private fun PoemCard(poem: Poem) {
+    val randomIllustration = remember {
+        listOf(
+            R.drawable.ic_notebook,
+            R.drawable.ic_pencils,
+            R.drawable.ic_watch
+        ).random()
+    }
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -55,64 +66,80 @@ private fun PoemCard(poem: Poem) {
         backgroundColor = MaterialTheme.colors.background,
         contentColor = MaterialTheme.colors.onBackground
     ) {
-        Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_quote),
-                    contentDescription = "",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .alpha(0.7f)
-                )
 
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = "",
-                    tint = Color.Unspecified,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Koromiko)
-                        .border(2.5.dp, Hibiscus, CircleShape)
-                )
-            }
 
-            if (poem.title.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_quote),
+                        contentDescription = "",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .alpha(0.7f)
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        contentDescription = "",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Koromiko)
+                            .border(2.5.dp, Hibiscus, CircleShape)
+                    )
+                }
+
+                if (poem.title.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = poem.title,
+                        style = MaterialTheme.typography.subtitle2,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                if (poem.content.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = poem.content,
+                        style = MaterialTheme.typography.body1,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = poem.title,
-                    style = MaterialTheme.typography.subtitle2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    text = poem.updatedAt.toString(),
+                    style = MaterialTheme.typography.caption,
+                    maxLines = 1,
                 )
             }
-
-            if (poem.content.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = poem.content,
-                    style = MaterialTheme.typography.body1,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = poem.updatedAt.toString(),
-                style = MaterialTheme.typography.caption,
-                maxLines = 1,
+            Image(
+                painter = painterResource(id = randomIllustration),
+                contentDescription = "",
+                contentScale = ContentScale.Fit,
+                alpha = 0.25f,
+                modifier = Modifier
+                    .size(200.dp)
+                    .rotate(60f)
+                    .offset(x = 60.dp, y = (-25).dp)
+                    .align(Alignment.BottomEnd)
             )
         }
+
     }
 }
 
@@ -134,5 +161,7 @@ fun PoemCardPreview() {
                 )
             }
         )
+
+       // PoemCard(poem = Poem.fake)
     }
 }
