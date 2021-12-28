@@ -1,44 +1,28 @@
 package io.github.ch8n.thoughts.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-        primary = Purple200,
-        primaryVariant = Purple700,
-        secondary = Teal200
-)
-
-private val LightColorPalette = lightColors(
-        primary = Purple500,
-        primaryVariant = Purple700,
-        secondary = Teal200
-
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
+    primary = Hibiscus,
+    primaryVariant = ScarletGum,
     onPrimary = Color.White,
+    secondary = Koromiko,
     onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+    background = Violet,
+    onBackground = Color.White,
+    surface = ScarletGum,
+    onSurface = Color.White,
 )
 
 @Composable
-fun ThoughtsTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
+fun ThoughtsTheme(content: @Composable() () -> Unit) {
     MaterialTheme(
-            colors = colors,
-            typography = Typography,
-            shapes = Shapes,
-            content = content
+        colors = DarkColorPalette,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
     )
 }
