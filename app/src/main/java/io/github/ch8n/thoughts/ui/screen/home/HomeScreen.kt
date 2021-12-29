@@ -143,6 +143,7 @@ private fun PoemCard(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
+            .border(0.5.dp, Color.White, MaterialTheme.shapes.large)
             .clickable {
                 onPoemClicked.invoke(poem)
             },
