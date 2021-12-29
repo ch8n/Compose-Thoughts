@@ -25,6 +25,8 @@ import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.template.TemplateSelectionDialog
+import io.github.ch8n.thoughts.ui.theme.ScarletGum
+import io.github.ch8n.thoughts.ui.theme.Violet
 import io.github.ch8n.thoughts.utils.loremIpsum
 
 @Composable
@@ -55,11 +57,13 @@ fun EditorScreen(
                     .fillMaxWidth()
                     .background(
                         brush = Brush.verticalGradient(
-                            0.7f to MaterialTheme.colors.primaryVariant,
-                            0.7f to MaterialTheme.colors.primaryVariant,
-                            0.9f to Color.Transparent
+                            colors = listOf(
+                                ScarletGum,
+                                Color.Transparent
+                            )
                         )
-                    ),
+                    )
+                    .height(72.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

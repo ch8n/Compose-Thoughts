@@ -31,6 +31,8 @@ import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
+import io.github.ch8n.thoughts.ui.theme.ScarletGum
+import io.github.ch8n.thoughts.ui.theme.Violet
 import io.github.ch8n.thoughts.utils.loremIpsum
 
 
@@ -103,13 +105,15 @@ fun HomeScreenRoot(
                 modifier = Modifier
                     .background(
                         brush = Brush.verticalGradient(
-                            0.7f to MaterialTheme.colors.surface,
-                            0.7f to MaterialTheme.colors.surface,
-                            0.9f to Color.Transparent
+                            colors = listOf(
+                                Violet,
+                                ScarletGum,
+                                Color.Transparent
+                            )
                         )
                     )
                     .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 48.dp),
                 onQuery = onSearch,
                 onProfileEditClicked = onProfileEditClicked
             )

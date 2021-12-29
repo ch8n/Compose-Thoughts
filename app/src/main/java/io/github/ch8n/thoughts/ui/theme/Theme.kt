@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import io.github.ch8n.thoughts.AppKeyboardFocusManager
 
 private val DarkColorPalette = darkColors(
     primary = Koromiko,
@@ -28,6 +29,7 @@ fun ThoughtsTheme(content: @Composable() () -> Unit) {
             darkIcons = false
         )
     }
+    AppKeyboardFocusManager()
     MaterialTheme(
         colors = DarkColorPalette,
         typography = Typography,

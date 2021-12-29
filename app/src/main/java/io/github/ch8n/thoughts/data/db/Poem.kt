@@ -18,8 +18,8 @@ data class Poem(
     companion object {
         val fake
             get() = Poem(
-                title = loremIpsum(10),
-                content = loremIpsum(25),
+                title = loremIpsum((10..25).random()),
+                content = loremIpsum((25..500).random()),
                 authorId = UUID.randomUUID().toString()
             )
     }
