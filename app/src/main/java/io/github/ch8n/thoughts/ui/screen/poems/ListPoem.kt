@@ -1,5 +1,6 @@
 package io.github.ch8n.thoughts.ui.screen.poems
 
+import android.app.Activity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
+import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
 import io.github.ch8n.thoughts.utils.loremIpsum
@@ -33,7 +36,8 @@ import io.github.ch8n.thoughts.utils.loremIpsum
 @Composable
 fun SearchPoem(
     modifier: Modifier,
-    onQuery: (query: String) -> Unit
+    onQuery: (query: String) -> Unit,
+    onProfileEditClicked: () -> Unit,
 ) {
     val (query, setQuery) = remember { mutableStateOf("") }
     Row(
@@ -41,7 +45,7 @@ fun SearchPoem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.ic_avatar),
             contentDescription = "",
             tint = Color.Unspecified,
             modifier = Modifier
@@ -50,6 +54,9 @@ fun SearchPoem(
                 .clip(CircleShape)
                 .background(Koromiko)
                 .border(2.5.dp, Hibiscus, CircleShape)
+                .clickable {
+                    onProfileEditClicked()
+                }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -83,7 +90,8 @@ fun SearchPoem(
 fun ListPoem(
     poems: List<Poem>,
     onSearch: (query: String) -> Unit,
-    onPoemClicked: (poem: Poem) -> Unit
+    onPoemClicked: (poem: Poem) -> Unit,
+    onProfileEditClicked: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -102,7 +110,8 @@ fun ListPoem(
                     )
                     .fillMaxWidth()
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
-                onQuery = onSearch
+                onQuery = onSearch,
+                onProfileEditClicked = onProfileEditClicked
             )
         }
         items(
@@ -205,6 +214,7 @@ fun PoemCardPreview(
     navigateTo: (Screen) -> Unit
 ) {
     Preview {
+        val context = LocalContext.current
         val list = remember {
             listOf(
                 Poem.fake,
@@ -219,25 +229,40 @@ fun PoemCardPreview(
         }
 
         val (displayList, setDisplayList) = remember { mutableStateOf(list) }
+        val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
 
-        ListPoem(
-            poems = displayList,
-            onSearch = { query ->
-                setDisplayList(
-                    if (query.isEmpty()) {
-                        list
-                    } else {
-                        list.filter {
-                            it.title.contains(query, ignoreCase = true)
-                                    || it.content.contains(query, ignoreCase = true)
+        Box(modifier = Modifier.fillMaxSize()) {
+            ListPoem(
+                poems = displayList,
+                onSearch = { query ->
+                    setDisplayList(
+                        if (query.isEmpty()) {
+                            list
+                        } else {
+                            list.filter {
+                                it.title.contains(query, ignoreCase = true)
+                                        || it.content.contains(query, ignoreCase = true)
+                            }
                         }
+                    )
+                },
+                onPoemClicked = {
+                    navigateTo(Screen.Editor(it))
+                },
+                onProfileEditClicked = {
+                    setProfileVisible.invoke(true)
+                }
+            )
+            if (isProfileVisible) {
+                ProfileDialog(
+                    activity = context as Activity,
+                    navigateBack = {
+                        setProfileVisible.invoke(false)
                     }
                 )
-            },
-            onPoemClicked = {
-                navigateTo(Screen.Editor(it))
             }
-        )
+        }
+
         // PoemCard(poem = Poem.fake)
     }
 }
