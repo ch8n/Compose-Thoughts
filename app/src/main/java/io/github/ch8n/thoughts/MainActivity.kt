@@ -7,10 +7,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import io.github.ch8n.thoughts.di.AppDI
-import io.github.ch8n.thoughts.ui.poems.PoemCardPreview
+import io.github.ch8n.thoughts.ui.screen.poems.PoemCardPreview
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
+import io.github.ch8n.thoughts.ui.theme.Violet
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
