@@ -13,11 +13,14 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowBackground">#3B185F</item>
     </style>
 
     <style name="Theme.Thoughts.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowBackground">#3B185F</item>
     </style>
 
     <style name="Theme.Thoughts.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

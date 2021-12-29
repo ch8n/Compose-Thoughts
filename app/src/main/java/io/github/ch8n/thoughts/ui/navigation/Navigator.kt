@@ -12,6 +12,8 @@ import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.screen.editor.EditorScreen
 import io.github.ch8n.thoughts.ui.screen.home.HomeScreen
+import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeTemplate
+import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.LeTemplateFeelWithMeTemplate
 
 sealed class Screen {
     object Home : Screen()
@@ -72,8 +74,14 @@ fun AppNavigator(startScreen: Screen) {
             navigateBack = ::back
         )
         is Screen.Home -> HomeScreen(::navigate)
-        is Screen.Templates.FeelWithMe -> TODO()
-        is Screen.Templates.LeThoughtDefault -> TODO()
+        is Screen.Templates.FeelWithMe -> FeelWithMeTemplate(
+            poem = top.poem,
+            author = top.author
+        )
+        is Screen.Templates.LeThoughtDefault -> LeTemplateFeelWithMeTemplate(
+            poem = top.poem,
+            author = top.author
+        )
         null -> (context as Activity).finish()
     }
 
