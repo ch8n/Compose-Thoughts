@@ -18,13 +18,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.ch8n.thoughts.R
+import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.utils.loremIpsum
 
 @Composable
-fun EditorScreen() {
-    val (header, setHeader) = remember { mutableStateOf(loremIpsum(8)) }
-    val (content, setContent) = remember { mutableStateOf(loremIpsum(200)) }
+fun EditorScreen(
+    poem: Poem,
+    navigateBack: () -> Unit,
+) {
+    val (header, setHeader) = remember { mutableStateOf(poem.title) }
+    val (content, setContent) = remember { mutableStateOf(poem.content) }
     val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis()}| ${content.length} Words") }
 
     LaunchedEffect(key1 = content) {
@@ -55,7 +59,7 @@ fun EditorScreen() {
                 modifier = Modifier
                     .padding(horizontal = 24.dp, vertical = 16.dp)
                     .clickable {
-                        //TODO on backpress
+                        navigateBack()
                     }
             ) {
                 Icon(
@@ -157,6 +161,11 @@ fun EditorScreen() {
 @Composable
 fun EditorScreenPreview() {
     Preview {
-        EditorScreen()
+        EditorScreen(
+            poem = Poem.fake,
+            navigateBack = {
+
+            }
+        )
     }
 }

@@ -20,11 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
+import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
 import io.github.ch8n.thoughts.utils.loremIpsum
@@ -45,7 +45,7 @@ fun SearchPoem(
             contentDescription = "",
             tint = Color.Unspecified,
             modifier = Modifier
-                .offset(y=4.dp,x= (-4).dp)
+                .offset(y = 4.dp, x = (-4).dp)
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Koromiko)
@@ -68,7 +68,7 @@ fun SearchPoem(
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search),
-                    contentDescription ="",
+                    contentDescription = "",
                     modifier = Modifier.size(20.dp),
                 )
             },
@@ -82,7 +82,8 @@ fun SearchPoem(
 @Composable
 fun ListPoem(
     poems: List<Poem>,
-    onSearch: (query: String) -> Unit
+    onSearch: (query: String) -> Unit,
+    onPoemClicked: (poem: Poem) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -108,14 +109,20 @@ fun ListPoem(
             items = poems,
             key = { poem -> poem.id }
         ) { poem ->
-            PoemCard(poem = poem)
+            PoemCard(
+                poem = poem,
+                onPoemClicked = onPoemClicked
+            )
         }
     }
 }
 
 
 @Composable
-private fun PoemCard(poem: Poem) {
+private fun PoemCard(
+    poem: Poem,
+    onPoemClicked: (poem: Poem) -> Unit
+) {
     val randomIllustration = remember {
         listOf(
             R.drawable.ic_notebook,
@@ -126,7 +133,10 @@ private fun PoemCard(poem: Poem) {
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                onPoemClicked.invoke(poem)
+            },
         shape = MaterialTheme.shapes.large,
         backgroundColor = MaterialTheme.colors.background,
         contentColor = MaterialTheme.colors.onBackground,
@@ -190,11 +200,11 @@ private fun PoemCard(poem: Poem) {
     }
 }
 
-@Preview
 @Composable
-fun PoemCardPreview() {
+fun PoemCardPreview(
+    navigateTo: (Screen) -> Unit
+) {
     Preview {
-
         val list = remember {
             listOf(
                 Poem.fake,
@@ -210,8 +220,6 @@ fun PoemCardPreview() {
 
         val (displayList, setDisplayList) = remember { mutableStateOf(list) }
 
-
-
         ListPoem(
             poems = displayList,
             onSearch = { query ->
@@ -225,6 +233,9 @@ fun PoemCardPreview() {
                         }
                     }
                 )
+            },
+            onPoemClicked = {
+                navigateTo(Screen.Editor(it))
             }
         )
         // PoemCard(poem = Poem.fake)
