@@ -8,15 +8,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.screen.editor.EditorScreen
-import io.github.ch8n.thoughts.ui.screen.poems.PoemCardPreview
+import io.github.ch8n.thoughts.ui.screen.home.HomeScreen
 
 sealed class Screen {
     object Home : Screen()
-    data class Editor(val poem: Poem) : Screen()
-    object Preview : Screen()
-    object Profile : Screen()
+    data class Editor(
+        val poem: Poem,
+        val author: Author
+    ) : Screen()
+
+    sealed class Templates(val label: String) : Screen() {
+        data class FeelWithMe(val author: Author, val poem: Poem) : Templates("Feels With Me")
+        data class LeThoughtDefault(val author: Author, val poem: Poem) :
+            Templates("LeThoughts + Feel With Me")
+    }
 }
 
 @Composable
@@ -57,10 +65,15 @@ fun AppNavigator(startScreen: Screen) {
     }
 
     when (val top = backStack.lastOrNull()) {
-        is Screen.Editor -> EditorScreen(poem = top.poem, ::back)
-        is Screen.Home -> PoemCardPreview(::navigate)
-        is Screen.Preview -> TODO()
-        is Screen.Profile -> TODO()
+        is Screen.Editor -> EditorScreen(
+            poem = top.poem,
+            author = top.author,
+            navigateTo = ::navigate,
+            navigateBack = ::back
+        )
+        is Screen.Home -> HomeScreen(::navigate)
+        is Screen.Templates.FeelWithMe -> TODO()
+        is Screen.Templates.LeThoughtDefault -> TODO()
         null -> (context as Activity).finish()
     }
 

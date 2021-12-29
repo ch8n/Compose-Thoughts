@@ -11,7 +11,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.AppNavigator
 import io.github.ch8n.thoughts.ui.navigation.Screen
-import io.github.ch8n.thoughts.ui.screen.poems.PoemCardPreview
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
 
 class MainActivity : ComponentActivity() {

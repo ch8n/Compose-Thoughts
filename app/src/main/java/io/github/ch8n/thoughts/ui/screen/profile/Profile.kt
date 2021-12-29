@@ -88,6 +88,7 @@ fun ProfileDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colors.background.copy(alpha = 0.7f))
         ) {
 
             Row(

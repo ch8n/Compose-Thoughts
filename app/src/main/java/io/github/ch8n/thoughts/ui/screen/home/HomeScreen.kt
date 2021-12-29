@@ -1,4 +1,4 @@
-package io.github.ch8n.thoughts.ui.screen.poems
+package io.github.ch8n.thoughts.ui.screen.home
 
 import android.app.Activity
 import androidx.compose.foundation.*
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.ch8n.thoughts.R
+import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
@@ -34,7 +35,7 @@ import io.github.ch8n.thoughts.utils.loremIpsum
 
 
 @Composable
-fun SearchPoem(
+private fun TopBar(
     modifier: Modifier,
     onQuery: (query: String) -> Unit,
     onProfileEditClicked: () -> Unit,
@@ -52,8 +53,7 @@ fun SearchPoem(
                 .offset(y = 4.dp, x = (-4).dp)
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Koromiko)
-                .border(2.5.dp, Hibiscus, CircleShape)
+                .border(2.5.dp, Koromiko, CircleShape)
                 .clickable {
                     onProfileEditClicked()
                 }
@@ -87,7 +87,7 @@ fun SearchPoem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListPoem(
+fun HomeScreenRoot(
     poems: List<Poem>,
     onSearch: (query: String) -> Unit,
     onPoemClicked: (poem: Poem) -> Unit,
@@ -99,7 +99,7 @@ fun ListPoem(
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         stickyHeader {
-            SearchPoem(
+            TopBar(
                 modifier = Modifier
                     .background(
                         brush = Brush.verticalGradient(
@@ -210,59 +210,62 @@ private fun PoemCard(
 }
 
 @Composable
-fun PoemCardPreview(
+fun HomeScreen(
     navigateTo: (Screen) -> Unit
 ) {
-    Preview {
-        val context = LocalContext.current
-        val list = remember {
-            listOf(
-                Poem.fake,
-                Poem.fake.copy(title = ""),
-                Poem.fake.copy(content = ""),
-                Poem.fake.copy(content = "${loremIpsum(20)} pokemon"),
-                Poem.fake,
-                Poem.fake,
-                Poem.fake,
-                Poem.fake,
-            )
-        }
+    val context = LocalContext.current
+    val author = remember { Author.fake }
 
-        val (displayList, setDisplayList) = remember { mutableStateOf(list) }
-        val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
+    val list = remember {
+        listOf(
+            Poem.fake,
+            Poem.fake.copy(title = ""),
+            Poem.fake.copy(content = ""),
+            Poem.fake.copy(content = "${loremIpsum(20)} pokemon"),
+            Poem.fake,
+            Poem.fake,
+            Poem.fake,
+            Poem.fake,
+        )
+    }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            ListPoem(
-                poems = displayList,
-                onSearch = { query ->
-                    setDisplayList(
-                        if (query.isEmpty()) {
-                            list
-                        } else {
-                            list.filter {
-                                it.title.contains(query, ignoreCase = true)
-                                        || it.content.contains(query, ignoreCase = true)
-                            }
+    val (displayList, setDisplayList) = remember { mutableStateOf(list) }
+    val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        HomeScreenRoot(
+            poems = displayList,
+            onSearch = { query ->
+                setDisplayList(
+                    if (query.isEmpty()) {
+                        list
+                    } else {
+                        list.filter {
+                            it.title.contains(query, ignoreCase = true)
+                                    || it.content.contains(query, ignoreCase = true)
                         }
-                    )
-                },
-                onPoemClicked = {
-                    navigateTo(Screen.Editor(it))
-                },
-                onProfileEditClicked = {
-                    setProfileVisible.invoke(true)
-                }
-            )
-            if (isProfileVisible) {
-                ProfileDialog(
-                    activity = context as Activity,
-                    navigateBack = {
-                        setProfileVisible.invoke(false)
                     }
                 )
+            },
+            onPoemClicked = {
+                navigateTo(
+                    Screen.Editor(
+                        poem = it,
+                        author = author
+                    )
+                )
+            },
+            onProfileEditClicked = {
+                setProfileVisible.invoke(true)
             }
+        )
+        if (isProfileVisible) {
+            ProfileDialog(
+                activity = context as Activity,
+                navigateBack = {
+                    setProfileVisible.invoke(false)
+                }
+            )
         }
-
-        // PoemCard(poem = Poem.fake)
     }
 }
