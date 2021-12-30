@@ -44,7 +44,7 @@ private fun TopBar(
 ) {
     val (query, setQuery) = remember { mutableStateOf("") }
     Row(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -84,6 +84,7 @@ private fun TopBar(
             maxLines = 1
         )
     }
+
 }
 
 
@@ -95,39 +96,60 @@ fun HomeScreenRoot(
     onPoemClicked: (poem: Poem) -> Unit,
     onProfileEditClicked: () -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = rememberLazyListState(),
-        contentPadding = PaddingValues(bottom = 16.dp)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
-        stickyHeader {
-            TopBar(
-                modifier = Modifier
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Violet,
-                                ScarletGum,
-                                Color.Transparent
-                            )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = rememberLazyListState(),
+            contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
+        ) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Divider(
+                        thickness = 6.dp,
+                        color = Color.White,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(16.dp)
+                            .align(Alignment.Center)
+                            .clip(MaterialTheme.shapes.large),
+                    )
+                }
+            }
+            items(
+                items = poems,
+                key = { poem -> poem.id }
+            ) { poem ->
+                PoemCard(
+                    poem = poem,
+                    onPoemClicked = onPoemClicked
+                )
+            }
+        }
+
+        TopBar(
+            modifier = Modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Violet,
+                            ScarletGum,
+                            Color.Transparent
                         )
                     )
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 48.dp),
-                onQuery = onSearch,
-                onProfileEditClicked = onProfileEditClicked
-            )
-        }
-        items(
-            items = poems,
-            key = { poem -> poem.id }
-        ) { poem ->
-            PoemCard(
-                poem = poem,
-                onPoemClicked = onPoemClicked
-            )
-        }
+                )
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 48.dp),
+            onQuery = onSearch,
+            onProfileEditClicked = onProfileEditClicked
+        )
+
     }
+
 }
 
 

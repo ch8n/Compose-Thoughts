@@ -12,6 +12,7 @@ import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.screen.editor.EditorScreen
 import io.github.ch8n.thoughts.ui.screen.home.HomeScreen
+import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeContent
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeTemplate
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.LeTemplateFeelWithMeTemplate
 

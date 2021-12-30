@@ -19,10 +19,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.drawToBitmap
 import java.io.IOException
 import java.io.OutputStream
 
@@ -141,4 +144,30 @@ fun Context.writeImageToExternalStorage(bitmap: Bitmap): Boolean {
             }
         )
     }.isSuccess
+}
+
+@Composable
+fun CaptureBitmap(
+    captureRequestKey: String,
+    content: @Composable () -> Unit,
+    onBitmapCaptured : (Bitmap) -> Unit
+) {
+    val context = LocalContext.current
+    val composeView = remember { ComposeView(context) }
+    // If key is changed it means it's requested to capture a Bitmap
+    LaunchedEffect(captureRequestKey) {
+        composeView.post {
+            onBitmapCaptured.invoke(composeView.drawToBitmap())
+        }
+    }
+
+    AndroidView(
+        factory = {
+            composeView.apply {
+                setContent {
+                    content.invoke()
+                }
+            }
+        }
+    )
 }
