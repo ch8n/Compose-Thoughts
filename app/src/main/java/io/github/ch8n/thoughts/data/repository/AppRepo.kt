@@ -10,9 +10,7 @@ import kotlinx.coroutines.withContext
 
 class AppRepo(private val appDatabase: AppDatabase) {
 
-    suspend fun getAuthors(): Flow<List<Author>> = withContext(Dispatchers.IO) {
-        return@withContext appDatabase.authorDao().getAllAuthor()
-    }
+    fun getAuthors(): Flow<List<Author>> = appDatabase.authorDao().getAllAuthor()
 
     suspend fun addAuthor(author: Author) = withContext(Dispatchers.IO) {
         return@withContext appDatabase.authorDao().addAuthor(author)

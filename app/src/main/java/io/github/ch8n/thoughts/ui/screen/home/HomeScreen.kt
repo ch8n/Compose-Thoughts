@@ -1,6 +1,7 @@
 package io.github.ch8n.thoughts.ui.screen.home
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,9 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,17 +22,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
-import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
+import io.github.ch8n.thoughts.data.repository.AppRepo
+import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
-import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
 import io.github.ch8n.thoughts.ui.theme.ScarletGum
 import io.github.ch8n.thoughts.ui.theme.Violet
-import io.github.ch8n.thoughts.utils.loremIpsum
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -236,43 +238,63 @@ private fun PoemCard(
     }
 }
 
-@Composable
-fun HomeScreen(
-    navigateTo: (Screen) -> Unit
-) {
-    val context = LocalContext.current
-    val author = remember { Author.fake }
 
-    val list = remember {
-        listOf(
-            Poem.fake,
-            Poem.fake.copy(title = ""),
-            Poem.fake.copy(content = ""),
-            Poem.fake.copy(content = "${loremIpsum(20)} pokemon"),
-            Poem.fake,
-            Poem.fake,
-            Poem.fake,
-            Poem.fake,
-        )
+class HomeViewModel(
+    private val appRepo: AppRepo
+) : ViewModel() {
+
+    private val query = MutableStateFlow("")
+
+    fun filterPoem(word: String) {
+        query.value = word
     }
 
-    val (displayList, setDisplayList) = remember { mutableStateOf(list) }
-    val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
+    fun updateAuthor(author: Author) {
+        viewModelScope.launch {
+            appRepo.addAuthor(author)
+        }
+    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        HomeScreenRoot(
-            poems = displayList,
-            onSearch = { query ->
-                setDisplayList(
-                    if (query.isEmpty()) {
-                        list
+    val observerPoems = query
+        .debounce(300)
+        .flatMapMerge { query ->
+            author
+                .flatMapMerge { appRepo.getAllPoems(it) }
+                .map {
+                    if (it.isEmpty()) {
+                        it
                     } else {
-                        list.filter {
+                        it.filter {
                             it.title.contains(query, ignoreCase = true)
                                     || it.content.contains(query, ignoreCase = true)
                         }
                     }
-                )
+                }
+        }
+
+    val author = appRepo
+        .getAuthors()
+        .map { it.first() }
+        .catch { error ->
+            Log.e("author", "error", error)
+        }
+}
+
+@Composable
+fun HomeScreen(
+    navigateTo: (Screen) -> Unit
+) {
+    val viewModel = remember { AppDI.homeViewModel }
+    val author by viewModel.author.collectAsState(initial = Author.Default)
+    val poems by viewModel.observerPoems.collectAsState(initial = emptyList())
+    val context = LocalContext.current
+
+    val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        HomeScreenRoot(
+            poems = poems,
+            onSearch = { query ->
+                viewModel.filterPoem(query)
             },
             onPoemClicked = {
                 navigateTo(
@@ -288,9 +310,13 @@ fun HomeScreen(
         )
         if (isProfileVisible) {
             ProfileDialog(
+                author = author,
                 activity = context as Activity,
                 navigateBack = {
                     setProfileVisible.invoke(false)
+                },
+                onDefaultAuthorUpdated = {
+                    viewModel.updateAuthor(it)
                 }
             )
         }

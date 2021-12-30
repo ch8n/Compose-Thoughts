@@ -26,6 +26,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.OutputStream
 
@@ -149,14 +151,17 @@ fun Context.writeImageToExternalStorage(bitmap: Bitmap): Boolean {
 fun CaptureBitmap(
     captureRequestKey: String,
     content: @Composable () -> Unit,
-    onBitmapCaptured : (Bitmap) -> Unit
+    onBitmapCaptured: (Bitmap) -> Unit
 ) {
     val context = LocalContext.current
     val composeView = remember { ComposeView(context) }
     // If key is changed it means it's requested to capture a Bitmap
     LaunchedEffect(captureRequestKey) {
         composeView.post {
-            onBitmapCaptured.invoke(composeView.drawToBitmap())
+            launch {
+                delay(2000)
+                onBitmapCaptured.invoke(composeView.drawToBitmap())
+            }
         }
     }
 

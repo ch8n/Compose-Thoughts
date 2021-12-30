@@ -1,34 +1,26 @@
 package io.github.ch8n.thoughts.ui.screen.profile
 
 import android.app.Activity
-import android.content.ContextWrapper
-import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,20 +28,21 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.ShimmerParams
 import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.R
+import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
-import io.github.ch8n.thoughts.utils.requestReadWritePermissions
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ProfileDialog(
     activity: Activity,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    author: Author,
+    onDefaultAuthorUpdated: (updatedAuthor: Author) -> Unit
 ) {
 
     BackHandler {
@@ -62,7 +55,7 @@ fun ProfileDialog(
             navigateBack.invoke()
         },
     ) {
-        val (avatarUri, setAvatarUri) = remember { mutableStateOf<Uri?>(null) }
+        val (avatarUri, setAvatarUri) = remember { mutableStateOf<Uri>(Uri.parse(author.avatarUri)) }
         val (isAvatarError, setAvatarError) = remember { mutableStateOf<Boolean>(false) }
         val launcherProfileImageResult =
             rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -70,8 +63,11 @@ fun ProfileDialog(
                 val data = result.data
                 when (resultCode) {
                     Activity.RESULT_OK -> {
-                        setAvatarUri.invoke(data?.data)
-                        setAvatarError.invoke(false)
+                        if (data?.data != null) {
+                            val uri = requireNotNull(data.data)
+                            setAvatarUri.invoke(uri)
+                        }
+                        setAvatarError.invoke(data?.data == null)
                     }
                     ImagePicker.RESULT_ERROR -> {
                         val error = ImagePicker.getError(data)
@@ -105,10 +101,10 @@ fun ProfileDialog(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
 
-                val (author, setAuthor) = remember { mutableStateOf("") }
+                val (updatedAuthorName, setAuthor) = remember { mutableStateOf(author.name) }
 
                 GlideImage(
-                    imageModel = avatarUri ?: R.drawable.ic_avatar,
+                    imageModel = avatarUri,
                     contentScale = ContentScale.Crop,
                     circularReveal = CircularReveal(duration = 250),
                     modifier = Modifier
@@ -126,7 +122,8 @@ fun ProfileDialog(
                                 .createIntent { intent ->
                                     launcherProfileImageResult.launch(intent)
                                 }
-                        }
+                        },
+                    placeHolder = painterResource(id = R.drawable.ic_avatar),
                 )
 
                 Spacer(modifier = Modifier.width(24.dp))
@@ -135,7 +132,7 @@ fun ProfileDialog(
                 Column {
 
                     OutlinedTextField(
-                        value = author,
+                        value = updatedAuthorName,
                         onValueChange = setAuthor,
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text(text = "Author Name?") },
@@ -150,7 +147,15 @@ fun ProfileDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        OutlinedButton(onClick = { /*TODO*/ }) {
+                        OutlinedButton(onClick = {
+                            onDefaultAuthorUpdated.invoke(
+                                author.copy(
+                                    name = updatedAuthorName,
+                                    avatarUri = avatarUri.toString()
+                                )
+                            )
+                            navigateBack.invoke()
+                        }) {
                             Text(text = "Save")
                         }
 
@@ -161,20 +166,5 @@ fun ProfileDialog(
                 }
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun ProfilePreview() {
-    Preview {
-        val activity = LocalContext.current as Activity
-        ProfileDialog(
-            navigateBack = {
-
-            },
-            activity = activity
-        )
     }
 }
