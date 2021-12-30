@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.skydoves.landscapist.CircularReveal
+import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
@@ -31,6 +34,7 @@ import io.github.ch8n.thoughts.data.repository.AppRepo
 import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
+import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
 import io.github.ch8n.thoughts.ui.theme.ScarletGum
 import io.github.ch8n.thoughts.ui.theme.Violet
@@ -43,16 +47,16 @@ private fun TopBar(
     modifier: Modifier,
     onQuery: (query: String) -> Unit,
     onProfileEditClicked: () -> Unit,
+    author: Author,
 ) {
     val (query, setQuery) = remember { mutableStateOf("") }
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_avatar),
-            contentDescription = "",
-            tint = Color.Unspecified,
+        GlideImage(
+            imageModel = author.avatarUri,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .offset(y = 4.dp, x = (-4).dp)
                 .size(48.dp)
@@ -60,7 +64,8 @@ private fun TopBar(
                 .border(2.5.dp, Koromiko, CircleShape)
                 .clickable {
                     onProfileEditClicked()
-                }
+                },
+            placeHolder = painterResource(id = R.drawable.ic_avatar),
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -97,6 +102,7 @@ fun HomeScreenRoot(
     onSearch: (query: String) -> Unit,
     onPoemClicked: (poem: Poem) -> Unit,
     onProfileEditClicked: () -> Unit,
+    author: Author,
 ) {
 
     Box(
@@ -134,6 +140,7 @@ fun HomeScreenRoot(
         }
 
         TopBar(
+            author = author,
             modifier = Modifier
                 .background(
                     brush = Brush.verticalGradient(
@@ -292,6 +299,7 @@ fun HomeScreen(
     val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         HomeScreenRoot(
+            author = author,
             poems = poems,
             onSearch = { query ->
                 viewModel.filterPoem(query)
