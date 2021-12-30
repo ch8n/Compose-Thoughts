@@ -99,7 +99,6 @@ fun Context.imageDecoderFromUriCompat(fileUri: Uri): Bitmap {
             fileUri
         )
     } else {
-
         val source = ImageDecoder.createSource(contentResolver, fileUri)
         ImageDecoder.decodeBitmap(source)
     }

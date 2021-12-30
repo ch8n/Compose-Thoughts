@@ -28,9 +28,25 @@ fun LeTemplateFeelWithMeTemplate(
     poem: Poem,
     author: Author,
 ) {
+    TemplateScaffold {
+        LeTemplateFeelWithMeContent(
+            poem = poem,
+            author = author,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
+
+}
+
+@Composable
+fun LeTemplateFeelWithMeContent(
+    poem: Poem,
+    author: Author,
+    modifier: Modifier,
+) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .background(MaterialTheme.colors.surface),
     ) {
         Column(
