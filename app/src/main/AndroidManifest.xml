@@ -20,7 +20,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.mydomain.fileprovider"
+            android:authorities="io.github.ch8n.thoughts"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

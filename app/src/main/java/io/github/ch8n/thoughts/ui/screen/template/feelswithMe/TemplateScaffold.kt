@@ -67,13 +67,11 @@ fun TemplateScaffold(content: @Composable () -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
                 contentDescription = "",
-                tint = White,
+                tint = Koromiko,
                 modifier = Modifier
                     .padding(16.dp)
                     .size(48.dp)
                     .padding(8.dp)
-                    .border(1.dp, White, CircleShape)
-                    .background(Koromiko)
                     .clickable {
                         scope.launch {
                             saveAndShare(bitmap, context)
@@ -113,7 +111,7 @@ suspend fun saveImage(image: Bitmap, context: Context): Uri? =
             image.compress(Bitmap.CompressFormat.PNG, 90, stream)
             stream.flush()
             stream.close()
-            uri = FileProvider.getUriForFile(context, "com.mydomain.fileprovider", file)
+            uri = FileProvider.getUriForFile(context, "io.github.ch8n.thoughts", file)
         } catch (e: IOException) {
             Log.d("Error", "IOException while trying to write file for sharing: " + e.message)
         }
