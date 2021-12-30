@@ -31,7 +31,7 @@ interface PoemDao {
     @Query("SELECT * FROM Poem WHERE authorId = :authorId ORDER BY updatedAt ASC")
     fun getAllPoem(authorId: String): Flow<List<Poem>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPoem(poem: Poem)
 
     @Delete

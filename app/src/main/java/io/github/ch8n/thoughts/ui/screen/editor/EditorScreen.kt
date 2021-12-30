@@ -5,29 +5,30 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
+import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
+import io.github.ch8n.thoughts.ui.screen.home.SharedViewModel
 import io.github.ch8n.thoughts.ui.screen.template.TemplateSelectionDialog
 import io.github.ch8n.thoughts.ui.theme.ScarletGum
-import io.github.ch8n.thoughts.ui.theme.Violet
-import io.github.ch8n.thoughts.utils.loremIpsum
+
 
 @Composable
 fun EditorScreen(
@@ -36,11 +37,30 @@ fun EditorScreen(
     navigateBack: () -> Unit,
     navigateTo: (Screen.Templates) -> Unit
 ) {
+    val sharedViewModel = AppDI.sharedViewModel
     val (header, setHeader) = remember { mutableStateOf(poem.title) }
     val (content, setContent) = remember { mutableStateOf(poem.content) }
     val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis()}| ${content.length} Words") }
     val (isTemplateVisible, setTemplateVisible) = remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    checkAndSavePoem(header, content, sharedViewModel, poem)
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            checkAndSavePoem(header, content, sharedViewModel, poem)
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     LaunchedEffect(key1 = content) {
         setInfo.invoke(
             "${System.currentTimeMillis()}| ${content.length} Words"
@@ -182,6 +202,27 @@ fun EditorScreen(
     }
 
 
+}
+
+private fun checkAndSavePoem(
+    header: String,
+    content: String,
+    sharedViewModel: SharedViewModel,
+    poem: Poem
+) {
+    if (header.isNotEmpty()
+        || content.isNotEmpty()
+        || poem.title != header
+        || poem.content != content
+    ) {
+        sharedViewModel.saveOrUpdatePoem(
+            poem.copy(
+                title = header,
+                content = content,
+                updatedAt = System.currentTimeMillis()
+            )
+        )
+    }
 }
 
 

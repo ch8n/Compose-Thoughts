@@ -24,8 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.dhaval2404.imagepicker.ImagePicker
-import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
@@ -34,10 +32,7 @@ import io.github.ch8n.thoughts.data.repository.AppRepo
 import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
-import io.github.ch8n.thoughts.ui.theme.Hibiscus
-import io.github.ch8n.thoughts.ui.theme.Koromiko
-import io.github.ch8n.thoughts.ui.theme.ScarletGum
-import io.github.ch8n.thoughts.ui.theme.Violet
+import io.github.ch8n.thoughts.ui.theme.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -102,6 +97,7 @@ fun HomeScreenRoot(
     onSearch: (query: String) -> Unit,
     onPoemClicked: (poem: Poem) -> Unit,
     onProfileEditClicked: () -> Unit,
+    onCreateNewPoem: () -> Unit,
     author: Author,
 ) {
 
@@ -109,7 +105,6 @@ fun HomeScreenRoot(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = rememberLazyListState(),
@@ -128,6 +123,7 @@ fun HomeScreenRoot(
                     )
                 }
             }
+
             items(
                 items = poems,
                 key = { poem -> poem.id }
@@ -157,10 +153,26 @@ fun HomeScreenRoot(
             onProfileEditClicked = onProfileEditClicked
         )
 
+        FloatingActionButton(
+            onClick = {
+                onCreateNewPoem.invoke()
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            backgroundColor = Purple
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_create),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(36.dp)
+            )
+        }
+
     }
 
 }
-
 
 @Composable
 private fun PoemCard(
@@ -246,7 +258,7 @@ private fun PoemCard(
 }
 
 
-class HomeViewModel(
+class SharedViewModel(
     private val appRepo: AppRepo
 ) : ViewModel() {
 
@@ -262,22 +274,28 @@ class HomeViewModel(
         }
     }
 
-    val observerPoems = query
-        .debounce(300)
-        .flatMapMerge { query ->
-            author
-                .flatMapMerge { appRepo.getAllPoems(it) }
-                .map {
-                    if (it.isEmpty()) {
-                        it
-                    } else {
-                        it.filter {
-                            it.title.contains(query, ignoreCase = true)
-                                    || it.content.contains(query, ignoreCase = true)
-                        }
-                    }
-                }
+    fun saveOrUpdatePoem(updatedPoem: Poem) {
+        viewModelScope.launch {
+            appRepo.addPoem(updatedPoem)
         }
+    }
+
+//    val observerPoems = query
+//        .debounce(300)
+//        .flatMapMerge { query ->
+//            author
+//                .flatMapMerge { appRepo.getAllPoems(it) }
+//                .map {
+//                    if (it.isEmpty()) {
+//                        it
+//                    } else {
+//                        it.filter {
+//                            it.title.contains(query, ignoreCase = true)
+//                                    || it.content.contains(query, ignoreCase = true)
+//                        }
+//                    }
+//                }
+//        }
 
     val author = appRepo
         .getAuthors()
@@ -285,13 +303,17 @@ class HomeViewModel(
         .catch { error ->
             Log.e("author", "error", error)
         }
+
+    val observerPoems = author
+        .flatMapMerge { appRepo.getAllPoems(it) }
+
 }
 
 @Composable
 fun HomeScreen(
     navigateTo: (Screen) -> Unit
 ) {
-    val viewModel = remember { AppDI.homeViewModel }
+    val viewModel = remember { AppDI.sharedViewModel }
     val author by viewModel.author.collectAsState(initial = Author.Default)
     val poems by viewModel.observerPoems.collectAsState(initial = emptyList())
     val context = LocalContext.current
@@ -314,6 +336,14 @@ fun HomeScreen(
             },
             onProfileEditClicked = {
                 setProfileVisible.invoke(true)
+            },
+            onCreateNewPoem = {
+                navigateTo(
+                    Screen.Editor(
+                        poem = Poem(title = "", content = "", authorId = author.uid),
+                        author = author
+                    )
+                )
             }
         )
         if (isProfileVisible) {
