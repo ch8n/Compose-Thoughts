@@ -1,6 +1,7 @@
 package io.github.ch8n.thoughts.ui.screen.editor
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -45,18 +46,36 @@ fun EditorScreen(
     val context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
+    BackHandler {
+        if (header.isNotEmpty() || content.isNotEmpty()){
+            sharedViewModel.saveOrUpdatePoem(
+                poem.copy(
+                    title = header,
+                    content = content,
+                    updatedAt = System.currentTimeMillis()
+                )
+            )
+        }
+        navigateBack.invoke()
+    }
+
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    checkAndSavePoem(header, content, sharedViewModel, poem)
+                    sharedViewModel.saveOrUpdatePoem(
+                        poem.copy(
+                            title = header,
+                            content = content,
+                            updatedAt = System.currentTimeMillis()
+                        )
+                    )
                 }
             }
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            checkAndSavePoem(header, content, sharedViewModel, poem)
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -154,10 +173,9 @@ fun EditorScreen(
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                BasicTextField(
-                    value = info,
-                    onValueChange = {},
-                    textStyle = MaterialTheme.typography.caption.copy(
+                Text(
+                    text = info,
+                    style = MaterialTheme.typography.caption.copy(
                         color = Color.White
                     )
                 )
@@ -201,30 +219,7 @@ fun EditorScreen(
         }
     }
 
-
 }
-
-private fun checkAndSavePoem(
-    header: String,
-    content: String,
-    sharedViewModel: SharedViewModel,
-    poem: Poem
-) {
-    if (header.isNotEmpty()
-        || content.isNotEmpty()
-        || poem.title != header
-        || poem.content != content
-    ) {
-        sharedViewModel.saveOrUpdatePoem(
-            poem.copy(
-                title = header,
-                content = content,
-                updatedAt = System.currentTimeMillis()
-            )
-        )
-    }
-}
-
 
 @Preview
 @Composable

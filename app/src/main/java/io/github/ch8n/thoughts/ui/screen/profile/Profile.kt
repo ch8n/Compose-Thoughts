@@ -55,8 +55,10 @@ fun ProfileDialog(
             navigateBack.invoke()
         },
     ) {
-        val (avatarUri, setAvatarUri) = remember { mutableStateOf<Uri>(Uri.parse(author.avatarUri)) }
+        val (avatarUri, setAvatarUri) = remember { mutableStateOf<Uri?>(null) }
+
         val (isAvatarError, setAvatarError) = remember { mutableStateOf<Boolean>(false) }
+
         val launcherProfileImageResult =
             rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 val resultCode = result.resultCode
@@ -104,7 +106,11 @@ fun ProfileDialog(
                 val (updatedAuthorName, setAuthor) = remember { mutableStateOf(author.name) }
 
                 GlideImage(
-                    imageModel = avatarUri,
+                    imageModel = avatarUri ?: if (author.avatarUri.isNullOrEmpty()) {
+                        author.placeholder
+                    } else {
+                        author.avatarUri
+                    },
                     contentScale = ContentScale.Crop,
                     circularReveal = CircularReveal(duration = 250),
                     modifier = Modifier

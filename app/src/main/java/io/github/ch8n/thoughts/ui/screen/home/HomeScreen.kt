@@ -1,6 +1,7 @@
 package io.github.ch8n.thoughts.ui.screen.home
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -50,7 +51,7 @@ private fun TopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            imageModel = author.avatarUri,
+            imageModel = if (author.avatarUri.isEmpty()) author.placeholder else Uri.parse(author.avatarUri),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .offset(y = 4.dp, x = (-4).dp)
@@ -59,8 +60,7 @@ private fun TopBar(
                 .border(2.5.dp, Koromiko, CircleShape)
                 .clickable {
                     onProfileEditClicked()
-                },
-            placeHolder = painterResource(id = R.drawable.ic_avatar),
+                }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -166,7 +166,9 @@ fun HomeScreenRoot(
                 painter = painterResource(id = R.drawable.ic_create),
                 contentDescription = "",
                 tint = Color.Unspecified,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier
+                    .size(36.dp)
+                    .rotate(-70f)
             )
         }
 
@@ -264,9 +266,62 @@ class SharedViewModel(
 
     private val query = MutableStateFlow("")
 
+    private val _displayPoems = MutableStateFlow(emptyList<Poem>())
+    private val _author = MutableStateFlow(Author.Default)
+    private val _allPoems = MutableStateFlow(emptyList<Poem>())
+    val displayPoems = _displayPoems.asStateFlow()
+    val author = _author.asStateFlow()
+
     fun filterPoem(word: String) {
         query.value = word
     }
+
+    init {
+        viewModelScope.launch {
+            appRepo
+                .getAuthors()
+                .map { it.first() }
+                .catch { error -> Log.e("author", "error", error) }
+                .collect {
+                    _author.emit(it)
+                }
+
+            _author
+                .flatMapMerge {
+                    appRepo.getAllPoems(it)
+                }
+                .catch { error ->
+                    Log.e("getAllPoems", "error", error)
+                    _allPoems.emit(emptyList())
+                }
+                .collect {
+                    _allPoems.emit(it)
+                }
+
+            query.debounce(300)
+                .flatMapMerge { _query ->
+                    if (_query.isEmpty()) {
+                        _allPoems
+                    } else {
+                        _allPoems.map {
+                            it.filter { poem ->
+                                poem.content.contains(_query, ignoreCase = true)
+                                        || poem.title.contains(_query, ignoreCase = true)
+                            }
+                        }
+                    }
+                }
+                .catch { error ->
+                    Log.e("filterPoem", "error", error)
+                    _displayPoems.emit(_allPoems.value)
+                }
+                .collect {
+                    _displayPoems.emit(it)
+                }
+        }
+
+    }
+
 
     fun updateAuthor(author: Author) {
         viewModelScope.launch {
@@ -280,33 +335,6 @@ class SharedViewModel(
         }
     }
 
-//    val observerPoems = query
-//        .debounce(300)
-//        .flatMapMerge { query ->
-//            author
-//                .flatMapMerge { appRepo.getAllPoems(it) }
-//                .map {
-//                    if (it.isEmpty()) {
-//                        it
-//                    } else {
-//                        it.filter {
-//                            it.title.contains(query, ignoreCase = true)
-//                                    || it.content.contains(query, ignoreCase = true)
-//                        }
-//                    }
-//                }
-//        }
-
-    val author = appRepo
-        .getAuthors()
-        .map { it.first() }
-        .catch { error ->
-            Log.e("author", "error", error)
-        }
-
-    val observerPoems = author
-        .flatMapMerge { appRepo.getAllPoems(it) }
-
 }
 
 @Composable
@@ -315,7 +343,7 @@ fun HomeScreen(
 ) {
     val viewModel = remember { AppDI.sharedViewModel }
     val author by viewModel.author.collectAsState(initial = Author.Default)
-    val poems by viewModel.observerPoems.collectAsState(initial = emptyList())
+    val poems by viewModel.displayPoems.collectAsState(initial = emptyList())
     val context = LocalContext.current
 
     val (isProfileVisible, setProfileVisible) = remember { mutableStateOf(false) }
@@ -334,9 +362,7 @@ fun HomeScreen(
                     )
                 )
             },
-            onProfileEditClicked = {
-                setProfileVisible.invoke(true)
-            },
+            onProfileEditClicked = { setProfileVisible.invoke(true) },
             onCreateNewPoem = {
                 navigateTo(
                     Screen.Editor(
