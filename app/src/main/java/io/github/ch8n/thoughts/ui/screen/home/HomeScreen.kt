@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -84,7 +87,14 @@ private fun TopBar(
                     modifier = Modifier.size(20.dp),
                 )
             },
-            maxLines = 1
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(
+                onGo = {
+                    onQuery.invoke(query)
+                }
+            ),
+            singleLine = true
         )
     }
 
@@ -299,35 +309,32 @@ class SharedViewModel(
             }
             .launchIn(viewModelScope)
 
-        author.onEach {
-            appRepo.getAllPoems(it).catch { error ->
+        author.onEach { _author ->
+            appRepo.getAllPoems(_author).catch { error ->
                 Log.e("getAllPoems", "error", error)
                 _allPoems.emit(emptyList())
+                _displayPoems.emit(emptyList())
             }.collect {
                 _allPoems.emit(it)
+                _displayPoems.emit(it)
             }
         }.launchIn(viewModelScope)
 
-        query.debounce(300)
-            .flatMapMerge { _query ->
-                if (_query.isEmpty()) {
-                    _allPoems
+        query.onEach { _query ->
+            _allPoems.value.filter { poem ->
+                poem.content.contains(_query, ignoreCase = true)
+                        || poem.title.contains(_query, ignoreCase = true)
+            }.also { filteredPoem ->
+                if (filteredPoem.isEmpty()) {
+                    _displayPoems.emit(_allPoems.value)
                 } else {
-                    _allPoems.map {
-                        it.filter { poem ->
-                            poem.content.contains(_query, ignoreCase = true)
-                                    || poem.title.contains(_query, ignoreCase = true)
-                        }
-                    }
+                    _displayPoems.emit(filteredPoem)
                 }
-            }.catch { error ->
-                Log.e("filterPoem", "error", error)
-                _displayPoems.emit(_allPoems.value)
             }
-            .map {
-                _displayPoems.emit(it)
-            }
-            .launchIn(viewModelScope)
+        }.catch { error ->
+            Log.e("filterPoem", "error", error)
+            _displayPoems.emit(_allPoems.value)
+        }.launchIn(viewModelScope)
 
     }
 

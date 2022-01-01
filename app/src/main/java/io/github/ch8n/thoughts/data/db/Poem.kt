@@ -28,7 +28,7 @@ data class Poem(
 @Dao
 interface PoemDao {
 
-    @Query("SELECT * FROM Poem WHERE authorId = :authorId ORDER BY updatedAt ASC")
+    @Query("SELECT * FROM Poem WHERE authorId = :authorId ORDER BY updatedAt DESC")
     fun getAllPoem(authorId: String): Flow<List<Poem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

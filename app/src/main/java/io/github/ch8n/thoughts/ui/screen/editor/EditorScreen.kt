@@ -44,7 +44,6 @@ fun EditorScreen(
     val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis()}| ${content.length} Words") }
     val (isTemplateVisible, setTemplateVisible) = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     BackHandler {
         navigateBack.invoke()
@@ -219,13 +218,16 @@ private fun savePoem(
     sharedViewModel: SharedViewModel,
     poem: Poem
 ) {
-    sharedViewModel.saveOrUpdatePoem(
-        poem.copy(
-            title = header,
-            content = content,
-            updatedAt = System.currentTimeMillis()
+    val isContentUpdated = header != poem.title || content != poem.content
+    if (isContentUpdated){
+        sharedViewModel.saveOrUpdatePoem(
+            poem.copy(
+                title = header,
+                content = content,
+                updatedAt = System.currentTimeMillis()
+            )
         )
-    )
+    }
 }
 
 @Preview
