@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -155,10 +156,11 @@ fun CaptureBitmap(
 ) {
     val context = LocalContext.current
     val composeView = remember { ComposeView(context) }
+    val scope = rememberCoroutineScope()
     // If key is changed it means it's requested to capture a Bitmap
     LaunchedEffect(captureRequestKey) {
         composeView.post {
-            launch {
+            scope.launch {
                 delay(2000)
                 onBitmapCaptured.invoke(composeView.drawToBitmap())
             }

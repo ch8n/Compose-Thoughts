@@ -201,7 +201,6 @@ fun EditorScreen(
             TemplateSelectionDialog(
                 author = author,
                 poem = poem,
-                activity = context as Activity,
                 navigateBack = {
                     setTemplateVisible.invoke(false)
                 },

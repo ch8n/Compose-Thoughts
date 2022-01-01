@@ -38,7 +38,6 @@ import io.github.ch8n.thoughts.ui.navigation.Screen
 fun TemplateSelectionDialog(
     author: Author,
     poem: Poem,
-    activity: Activity,
     navigateBack: () -> Unit,
     navigateTo: (Screen.Templates) -> Unit
 ) {
@@ -140,11 +139,9 @@ fun TemplateSelectionDialog(
 @Composable
 fun TemplateSelectionDialogPreview() {
     Preview {
-        val activity = LocalContext.current as Activity
         TemplateSelectionDialog(
             author = Author.fake,
             poem = Poem.fake,
-            activity = activity,
             navigateBack = {
 
             },
