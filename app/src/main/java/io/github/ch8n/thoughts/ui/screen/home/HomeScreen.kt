@@ -38,6 +38,8 @@ import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -345,8 +347,11 @@ class SharedViewModel(
         }
     }
 
+    private var jobSavePoem: Job? = null
     fun saveOrUpdatePoem(updatedPoem: Poem) {
-        viewModelScope.launch {
+        jobSavePoem?.cancel()
+        jobSavePoem = viewModelScope.launch {
+            delay(500)
             appRepo.addPoem(updatedPoem)
         }
     }
