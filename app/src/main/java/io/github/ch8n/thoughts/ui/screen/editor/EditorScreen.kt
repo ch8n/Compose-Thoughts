@@ -42,7 +42,7 @@ fun EditorScreen(
     val sharedViewModel = AppDI.sharedViewModel
     val (header, setHeader) = remember { mutableStateOf(poem.title) }
     val (content, setContent) = remember { mutableStateOf(poem.content) }
-    val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis()}| ${content.length} Words") }
+    val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis().toDate()} | ${content.length} Words") }
     val (isTemplateVisible, setTemplateVisible) = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
