@@ -34,6 +34,7 @@ import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

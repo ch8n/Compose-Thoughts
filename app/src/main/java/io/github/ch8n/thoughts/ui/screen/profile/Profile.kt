@@ -157,7 +157,7 @@ fun ProfileDialog(
                             onDefaultAuthorUpdated.invoke(
                                 author.copy(
                                     name = updatedAuthorName,
-                                    avatarUri = avatarUri.toString()
+                                    avatarUri = avatarUri?.toString() ?: ""
                                 )
                             )
                             navigateBack.invoke()

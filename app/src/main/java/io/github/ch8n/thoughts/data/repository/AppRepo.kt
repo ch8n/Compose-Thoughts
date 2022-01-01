@@ -16,9 +16,7 @@ class AppRepo(private val appDatabase: AppDatabase) {
         return@withContext appDatabase.authorDao().addAuthor(author)
     }
 
-    suspend fun getAllPoems(author: Author) = withContext(Dispatchers.IO) {
-        return@withContext appDatabase.poemDao().getAllPoem(author.uid)
-    }
+    fun getAllPoems(author: Author) = appDatabase.poemDao().getAllPoem(author.uid)
 
     suspend fun addPoem(poem: Poem) = withContext(Dispatchers.IO) {
         return@withContext appDatabase.poemDao().addPoem(poem)
