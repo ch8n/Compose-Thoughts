@@ -194,9 +194,7 @@ private fun PoemCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .border(0.5.dp, Color.White, MaterialTheme.shapes.large)
-            .clickable {
-                onPoemClicked.invoke(poem)
-            },
+            .clickable { onPoemClicked.invoke(poem) },
         shape = MaterialTheme.shapes.large,
         backgroundColor = MaterialTheme.colors.background,
         contentColor = MaterialTheme.colors.onBackground,
@@ -216,6 +214,17 @@ private fun PoemCard(
                         .size(36.dp)
                         .alpha(0.7f)
                 )
+
+                if (poem.title.isEmpty() && poem.content.isEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Creativity Pending...",
+                        style = MaterialTheme.typography.subtitle2,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
 
                 if (poem.title.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -278,48 +287,47 @@ class SharedViewModel(
     }
 
     init {
-        viewModelScope.launch {
-            appRepo
-                .getAuthors()
-                .map { it.first() }
-                .catch { error -> Log.e("author", "error", error) }
-                .collect {
-                    _author.emit(it)
+        appRepo.getAuthors()
+            .onEach {
+                val author = it.firstOrNull()
+                if (author != null) {
+                    _author.emit(author)
                 }
+            }
+            .catch { error ->
+                Log.e("author", "error", error)
+            }
+            .launchIn(viewModelScope)
 
-            _author
-                .flatMapMerge {
-                    appRepo.getAllPoems(it)
-                }
-                .catch { error ->
-                    Log.e("getAllPoems", "error", error)
-                    _allPoems.emit(emptyList())
-                }
-                .collect {
-                    _allPoems.emit(it)
-                }
+        author.onEach {
+            appRepo.getAllPoems(it).catch { error ->
+                Log.e("getAllPoems", "error", error)
+                _allPoems.emit(emptyList())
+            }.collect {
+                _allPoems.emit(it)
+            }
+        }.launchIn(viewModelScope)
 
-            query.debounce(300)
-                .flatMapMerge { _query ->
-                    if (_query.isEmpty()) {
-                        _allPoems
-                    } else {
-                        _allPoems.map {
-                            it.filter { poem ->
-                                poem.content.contains(_query, ignoreCase = true)
-                                        || poem.title.contains(_query, ignoreCase = true)
-                            }
+        query.debounce(300)
+            .flatMapMerge { _query ->
+                if (_query.isEmpty()) {
+                    _allPoems
+                } else {
+                    _allPoems.map {
+                        it.filter { poem ->
+                            poem.content.contains(_query, ignoreCase = true)
+                                    || poem.title.contains(_query, ignoreCase = true)
                         }
                     }
                 }
-                .catch { error ->
-                    Log.e("filterPoem", "error", error)
-                    _displayPoems.emit(_allPoems.value)
-                }
-                .collect {
-                    _displayPoems.emit(it)
-                }
-        }
+            }.catch { error ->
+                Log.e("filterPoem", "error", error)
+                _displayPoems.emit(_allPoems.value)
+            }
+            .map {
+                _displayPoems.emit(it)
+            }
+            .launchIn(viewModelScope)
 
     }
 
@@ -333,6 +341,12 @@ class SharedViewModel(
     fun saveOrUpdatePoem(updatedPoem: Poem) {
         viewModelScope.launch {
             appRepo.addPoem(updatedPoem)
+        }
+    }
+
+    fun deletePoem(poem: Poem) {
+        viewModelScope.launch {
+            appRepo.deletePoem(poem)
         }
     }
 

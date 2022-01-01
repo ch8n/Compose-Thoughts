@@ -36,7 +36,7 @@ fun EditorScreen(
     author: Author,
     poem: Poem,
     navigateBack: () -> Unit,
-    navigateTo: (Screen.Templates) -> Unit
+    navigateTo: (Screen.Templates) -> Unit,
 ) {
     val sharedViewModel = AppDI.sharedViewModel
     val (header, setHeader) = remember { mutableStateOf(poem.title) }
@@ -47,40 +47,11 @@ fun EditorScreen(
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     BackHandler {
-        if (header.isNotEmpty() || content.isNotEmpty()){
-            sharedViewModel.saveOrUpdatePoem(
-                poem.copy(
-                    title = header,
-                    content = content,
-                    updatedAt = System.currentTimeMillis()
-                )
-            )
-        }
         navigateBack.invoke()
     }
 
-    DisposableEffect(key1 = lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    sharedViewModel.saveOrUpdatePoem(
-                        poem.copy(
-                            title = header,
-                            content = content,
-                            updatedAt = System.currentTimeMillis()
-                        )
-                    )
-                }
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    LaunchedEffect(key1 = content) {
+    LaunchedEffect(key1 = content, header) {
+        savePoem(header, content, sharedViewModel, poem)
         setInfo.invoke(
             "${System.currentTimeMillis()}| ${content.length} Words"
         )
@@ -132,17 +103,38 @@ fun EditorScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .clickable {
-                            setTemplateVisible.invoke(true)
-                        }
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_share),
-                        contentDescription = "",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
+
+                    IconButton(
+                        onClick = {
+                            sharedViewModel.deletePoem(poem)
+                            navigateBack.invoke()
+                        },
+                        modifier = Modifier.wrapContentSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_delete),
+                            contentDescription = "",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(
+                        onClick = { setTemplateVisible.invoke(true) },
+                        modifier = Modifier.wrapContentSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_share),
+                            contentDescription = "",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+
                 }
             }
 
@@ -219,6 +211,21 @@ fun EditorScreen(
         }
     }
 
+}
+
+private fun savePoem(
+    header: String,
+    content: String,
+    sharedViewModel: SharedViewModel,
+    poem: Poem
+) {
+    sharedViewModel.saveOrUpdatePoem(
+        poem.copy(
+            title = header,
+            content = content,
+            updatedAt = System.currentTimeMillis()
+        )
+    )
 }
 
 @Preview

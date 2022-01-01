@@ -5,18 +5,25 @@ import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 
 class AppRepo(private val appDatabase: AppDatabase) {
 
-    fun getAuthors(): Flow<List<Author>> = appDatabase.authorDao().getAllAuthor()
+    fun getAuthors(): Flow<List<Author>> = appDatabase
+        .authorDao()
+        .getAllAuthor()
+        .flowOn(Dispatchers.IO)
 
     suspend fun addAuthor(author: Author) = withContext(Dispatchers.IO) {
         return@withContext appDatabase.authorDao().addAuthor(author)
     }
 
-    fun getAllPoems(author: Author) = appDatabase.poemDao().getAllPoem(author.uid)
+    fun getAllPoems(author: Author) = appDatabase
+        .poemDao()
+        .getAllPoem(author.uid)
+        .flowOn(Dispatchers.IO)
 
     suspend fun addPoem(poem: Poem) = withContext(Dispatchers.IO) {
         return@withContext appDatabase.poemDao().addPoem(poem)

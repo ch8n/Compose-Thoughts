@@ -103,7 +103,7 @@ fun ProfileDialog(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
 
-                val (updatedAuthorName, setAuthor) = remember { mutableStateOf(author.name) }
+                val (updatedName, setUpdatedName) = remember { mutableStateOf(author.name) }
 
                 GlideImage(
                     imageModel = avatarUri ?: if (author.avatarUri.isNullOrEmpty()) {
@@ -138,8 +138,8 @@ fun ProfileDialog(
                 Column {
 
                     OutlinedTextField(
-                        value = updatedAuthorName,
-                        onValueChange = setAuthor,
+                        value = updatedName,
+                        onValueChange = setUpdatedName,
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text(text = "Author Name?") },
                         shape = MaterialTheme.shapes.medium,
@@ -156,7 +156,7 @@ fun ProfileDialog(
                         OutlinedButton(onClick = {
                             onDefaultAuthorUpdated.invoke(
                                 author.copy(
-                                    name = updatedAuthorName,
+                                    name = if (updatedName.isEmpty()) author.name else updatedName,
                                     avatarUri = avatarUri?.toString() ?: author.avatarUri
                                 )
                             )
