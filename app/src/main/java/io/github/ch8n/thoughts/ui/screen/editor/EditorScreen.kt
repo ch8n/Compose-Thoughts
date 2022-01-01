@@ -29,6 +29,7 @@ import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.home.SharedViewModel
 import io.github.ch8n.thoughts.ui.screen.template.TemplateSelectionDialog
 import io.github.ch8n.thoughts.ui.theme.ScarletGum
+import io.github.ch8n.thoughts.utils.toDate
 
 
 @Composable
@@ -52,7 +53,7 @@ fun EditorScreen(
     LaunchedEffect(key1 = content, header) {
         savePoem(header, content, sharedViewModel, poem)
         setInfo.invoke(
-            "${System.currentTimeMillis()}| ${content.length} Words"
+            "${System.currentTimeMillis().toDate()} | ${content.length} Words"
         )
     }
 

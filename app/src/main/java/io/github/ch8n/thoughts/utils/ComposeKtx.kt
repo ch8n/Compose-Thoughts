@@ -31,9 +31,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun loremIpsum(words: Int = 500): String {
     return LoremIpsum(words).values.joinToString()
+}
+
+fun Long.toDate(format: String = "dd/MM/yyyy"): String {
+    val formatter = SimpleDateFormat(format, Locale.getDefault())
+    return formatter.format(Date(this))
 }
 
 val isMinSdk29 get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q

@@ -37,6 +37,7 @@ import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.*
+import io.github.ch8n.thoughts.utils.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -260,7 +261,7 @@ private fun PoemCard(
 
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = poem.updatedAt.toString(),
+                    text = poem.updatedAt.toDate(),
                     style = MaterialTheme.typography.caption,
                     maxLines = 1,
                 )
