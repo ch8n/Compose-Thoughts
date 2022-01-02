@@ -4,6 +4,8 @@ import android.app.Activity
 import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -126,33 +129,49 @@ fun HomeScreenRoot(
             .fillMaxWidth()
     ) {
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = rememberLazyListState(),
-            contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
+        val (isPoemEmpty, setPoemEmpty) = remember { mutableStateOf(false) }
+
+        LaunchedEffect(key1 = poems) {
+            setPoemEmpty.invoke(poems.isEmpty())
+        }
+
+        AnimatedVisibility(
+            visible = isPoemEmpty,
+            exit = fadeOut(),
+            enter = fadeIn()
         ) {
-            item {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Divider(
-                        thickness = 6.dp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .width(200.dp)
-                            .padding(16.dp)
-                            .align(Alignment.Center)
-                            .clip(MaterialTheme.shapes.large),
+            EmptyPoems()
+        }
+
+        if (!isPoemEmpty) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = rememberLazyListState(),
+                contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
+            ) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Divider(
+                            thickness = 6.dp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(16.dp)
+                                .align(Alignment.Center)
+                                .clip(MaterialTheme.shapes.large),
+                        )
+                    }
+                }
+
+                items(
+                    items = poems,
+                    key = { poem -> poem.id }
+                ) { poem ->
+                    PoemCard(
+                        poem = poem,
+                        onPoemClicked = onPoemClicked
                     )
                 }
-            }
-
-            items(
-                items = poems,
-                key = { poem -> poem.id }
-            ) { poem ->
-                PoemCard(
-                    poem = poem,
-                    onPoemClicked = onPoemClicked
-                )
             }
         }
 
@@ -195,6 +214,37 @@ fun HomeScreenRoot(
 
     }
 
+}
+
+@Composable
+fun EmptyPoems() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_idea_pencil),
+                contentDescription = "",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(120.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Empty?\nLet's put Ink on it...",
+                style = TextStyle.Default.copy(
+                    fontFamily = Caveat,
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
+                )
+            )
+
+        }
+    }
 }
 
 @Composable
