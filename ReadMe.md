@@ -8,22 +8,25 @@ A Jetpack Compose Poem writing application
 
 ## Features
 ### V1
-- [ ] Write poem
-- [ ] Pick solid color - Black
-- [ ] Pick Text color - White
-- [ ] Pick avatar image
-- [ ] Exportable : instagram, Whatsapp, Telegram
-- [ ] Save as draft
-- [ ] Avatar Preview
+- [x] Write poem
+- [x] Pick solid color - Black
+- [x] Pick Text color - White
+- [x] Pick avatar image
+- [x] Shared Image
+- [x] Save as draft
+- [x] Avatar Preview
+- [x] Image from Gallery
+- [ ] App analytics
+- [ ] Crash Analytics
+- [ ] Notifications
 
 ### V2
 Background
 ---
-- [ ] Image from Gallery
-- [ ] Image from Url
 - [ ] Image blurring
 - [ ] Multiple Color Select
 - [ ] Color Gradient
+- [ ] share image from resolution
 
 Fonts
 ---
