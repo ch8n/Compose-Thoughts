@@ -19,6 +19,8 @@ A Jetpack Compose Poem writing application
 - [ ] App analytics
 - [ ] Crash Analytics
 - [ ] Notifications
+- [ ] remote config app update dialog
+- [ ] Export/Import poems as csv
 
 ### V2
 Background
