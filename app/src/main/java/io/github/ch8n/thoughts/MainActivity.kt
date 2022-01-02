@@ -20,6 +20,7 @@ import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.AppNavigator
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
+import io.github.ch8n.thoughts.utils.CrashReportingTree
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +29,8 @@ class MainActivity : ComponentActivity() {
         AppDI.setAppContext(applicationContext)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(CrashReportingTree())
         }
         setContent {
             ThoughtsTheme {

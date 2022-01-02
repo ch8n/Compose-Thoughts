@@ -18,7 +18,8 @@ A Jetpack Compose Poem writing application
 - [x] Image from Gallery
 - [x] Crash Analytics -> Firebase
 - [x] App Performance -> Firebase
-- [ ] Only dev logging -> Timber
+- [x] Only dev logging -> Timber
+- [ ] Application icon
 - [ ] Notifications -> Firebase
 - [ ] App update -> Firebase
 - [ ] Room db migration
