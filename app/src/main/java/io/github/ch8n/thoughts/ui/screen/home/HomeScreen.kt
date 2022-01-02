@@ -234,7 +234,7 @@ fun EmptyPoems() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Empty?\nLet's put Ink on it...",
+                text = "New Thought \uD83E\uDD14?\nLet's put Ink on it...",
                 style = TextStyle.Default.copy(
                     fontFamily = Caveat,
                     color = Color.White,
