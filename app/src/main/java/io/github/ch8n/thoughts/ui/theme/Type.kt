@@ -8,6 +8,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import io.github.ch8n.thoughts.R
 
+
+val Caveat = FontFamily(
+    Font(R.font.caveat_regular, FontWeight.Normal)
+)
+
 private val Nunito = FontFamily(
     Font(R.font.nunito_light, FontWeight.Light),
     Font(R.font.nunito_regular, FontWeight.Normal),

@@ -3,6 +3,7 @@ package io.github.ch8n.thoughts.ui.screen.home
 import android.app.Activity
 import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,17 +24,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.airbnb.lottie.compose.*
 import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.data.repository.AppRepo
 import io.github.ch8n.thoughts.di.AppDI
+import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.profile.ProfileDialog
 import io.github.ch8n.thoughts.ui.theme.*
@@ -119,33 +125,38 @@ fun HomeScreenRoot(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = rememberLazyListState(),
-            contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
-        ) {
-            item {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Divider(
-                        thickness = 6.dp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .width(200.dp)
-                            .padding(16.dp)
-                            .align(Alignment.Center)
-                            .clip(MaterialTheme.shapes.large),
+
+        if (poems.isEmpty()) {
+            EmptyPoems()
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = rememberLazyListState(),
+                contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
+            ) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Divider(
+                            thickness = 6.dp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(16.dp)
+                                .align(Alignment.Center)
+                                .clip(MaterialTheme.shapes.large),
+                        )
+                    }
+                }
+
+                items(
+                    items = poems,
+                    key = { poem -> poem.id }
+                ) { poem ->
+                    PoemCard(
+                        poem = poem,
+                        onPoemClicked = onPoemClicked
                     )
                 }
-            }
-
-            items(
-                items = poems,
-                key = { poem -> poem.id }
-            ) { poem ->
-                PoemCard(
-                    poem = poem,
-                    onPoemClicked = onPoemClicked
-                )
             }
         }
 
@@ -413,4 +424,48 @@ fun HomeScreen(
             )
         }
     }
+}
+
+@Composable
+fun EmptyPoems() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.notebook_animation))
+    val progress by animateLottieCompositionAsState(composition)
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LottieAnimation(
+                composition = composition,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.3f),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            AnimatedVisibility(visible = progress == 1f) {
+                Text(
+                    text = "Let's make some Quotes..",
+                    style = TextStyle.Default.copy(
+                        fontFamily = Caveat,
+                        color = Color.White,
+                        fontSize = 32.sp
+                    )
+                )
+            }
+        }
+
+    }
+}
+
+@Preview
+@Composable
+fun EmptyNotes() {
+    Preview {
+        EmptyPoems()
+    }
+
 }
