@@ -12,11 +12,12 @@ import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
 import io.github.ch8n.thoughts.ui.screen.editor.EditorScreen
 import io.github.ch8n.thoughts.ui.screen.home.HomeScreen
-import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeContent
+import io.github.ch8n.thoughts.ui.screen.splash.Splash
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeTemplate
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.LeTemplateFeelWithMeTemplate
 
 sealed class Screen {
+    object Splash : Screen()
     object Home : Screen()
     data class Editor(
         val poem: Poem,
@@ -31,18 +32,10 @@ sealed class Screen {
 }
 
 @Composable
-fun AppNavigator(startScreen: Screen) {
+fun AppNavigator(splashScreen: Screen) {
 
-    val (backStack, setBackStack) = remember { mutableStateOf<List<Screen>>(listOf(startScreen)) }
+    val (backStack, setBackStack) = remember { mutableStateOf<List<Screen>>(listOf(splashScreen)) }
     val context = LocalContext.current
-
-    BackHandler {
-        setBackStack(backStack.dropLast(1))
-        Log.e(
-            "backstack",
-            "pressed back"
-        )
-    }
 
     LaunchedEffect(key1 = backStack) {
         Log.e(
@@ -51,30 +44,41 @@ fun AppNavigator(startScreen: Screen) {
         )
     }
 
-    fun navigate(screen: Screen) {
+    fun onNavigationTo(screen: Screen) {
         setBackStack(backStack + screen)
         Log.e(
             "backstack",
-            "navigate"
+            "navigate ${screen::class.simpleName}"
         )
     }
 
-    fun back() {
-        setBackStack(backStack.dropLast(1))
+    fun onNavigationBack() {
+        val dropped = backStack.dropLast(1)
+        val isSplashScreen = dropped.last() == splashScreen
+        if (isSplashScreen) {
+            (context as Activity).finish()
+        } else {
+            setBackStack(dropped)
+        }
         Log.e(
             "backstack",
-            "back"
+            "onBack ${backStack.map { it::class.simpleName }.joinToString(",")}"
         )
     }
 
-    when (val top = backStack.lastOrNull()) {
+    BackHandler {
+        onNavigationBack()
+    }
+
+    when (val top = backStack.last()) {
+        is Screen.Splash -> Splash(::onNavigationTo)
         is Screen.Editor -> EditorScreen(
             poem = top.poem,
             author = top.author,
-            navigateTo = ::navigate,
-            navigateBack = ::back
+            navigateTo = ::onNavigationTo,
+            navigateBack = ::onNavigationBack
         )
-        is Screen.Home -> HomeScreen(::navigate)
+        is Screen.Home -> HomeScreen(::onNavigationTo)
         is Screen.Templates.FeelWithMe -> FeelWithMeTemplate(
             poem = top.poem,
             author = top.author
@@ -83,7 +87,6 @@ fun AppNavigator(startScreen: Screen) {
             poem = top.poem,
             author = top.author
         )
-        null -> (context as Activity).finish()
     }
 
 }

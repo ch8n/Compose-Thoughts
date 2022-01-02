@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             ThoughtsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    AppNavigator(Screen.Home)
+                    AppNavigator(Screen.Splash)
                 }
             }
         }

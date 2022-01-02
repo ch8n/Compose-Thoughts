@@ -126,37 +126,33 @@ fun HomeScreenRoot(
             .fillMaxWidth()
     ) {
 
-        if (poems.isEmpty()) {
-            EmptyPoems()
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = rememberLazyListState(),
-                contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
-            ) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Divider(
-                            thickness = 6.dp,
-                            color = Color.White,
-                            modifier = Modifier
-                                .width(200.dp)
-                                .padding(16.dp)
-                                .align(Alignment.Center)
-                                .clip(MaterialTheme.shapes.large),
-                        )
-                    }
-                }
-
-                items(
-                    items = poems,
-                    key = { poem -> poem.id }
-                ) { poem ->
-                    PoemCard(
-                        poem = poem,
-                        onPoemClicked = onPoemClicked
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = rememberLazyListState(),
+            contentPadding = PaddingValues(bottom = 16.dp, top = 88.dp)
+        ) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Divider(
+                        thickness = 6.dp,
+                        color = Color.White,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(16.dp)
+                            .align(Alignment.Center)
+                            .clip(MaterialTheme.shapes.large),
                     )
                 }
+            }
+
+            items(
+                items = poems,
+                key = { poem -> poem.id }
+            ) { poem ->
+                PoemCard(
+                    poem = poem,
+                    onPoemClicked = onPoemClicked
+                )
             }
         }
 
@@ -424,48 +420,4 @@ fun HomeScreen(
             )
         }
     }
-}
-
-@Composable
-fun EmptyPoems() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.notebook_animation))
-    val progress by animateLottieCompositionAsState(composition)
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LottieAnimation(
-                composition = composition,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .fillMaxHeight(0.3f),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            AnimatedVisibility(visible = progress == 1f) {
-                Text(
-                    text = "Let's make some Quotes..",
-                    style = TextStyle.Default.copy(
-                        fontFamily = Caveat,
-                        color = Color.White,
-                        fontSize = 32.sp
-                    )
-                )
-            }
-        }
-
-    }
-}
-
-@Preview
-@Composable
-fun EmptyNotes() {
-    Preview {
-        EmptyPoems()
-    }
-
 }
