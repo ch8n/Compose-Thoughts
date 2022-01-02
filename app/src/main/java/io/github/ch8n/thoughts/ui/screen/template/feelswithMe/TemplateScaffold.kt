@@ -32,6 +32,7 @@ import io.github.ch8n.thoughts.utils.writeImageToExternalStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -113,7 +114,7 @@ suspend fun saveImage(image: Bitmap, context: Context): Uri? =
             stream.close()
             uri = FileProvider.getUriForFile(context, "io.github.ch8n.thoughts", file)
         } catch (e: IOException) {
-            Log.d("Error", "IOException while trying to write file for sharing: " + e.message)
+            Timber.d("IOException while trying to write file for sharing: " + e.message)
         }
         uri
     }

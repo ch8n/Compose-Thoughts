@@ -18,6 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Thoughts">
 
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="true" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="io.github.ch8n.thoughts"

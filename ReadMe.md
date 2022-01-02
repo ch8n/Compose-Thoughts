@@ -16,11 +16,14 @@ A Jetpack Compose Poem writing application
 - [x] Save as draft
 - [x] Avatar Preview
 - [x] Image from Gallery
-- [ ] App analytics
-- [ ] Crash Analytics
-- [ ] Notifications
-- [ ] remote config app update dialog
+- [x] Crash Analytics -> Firebase
+- [x] App Performance -> Firebase
+- [ ] Only dev logging -> Timber
+- [ ] Notifications -> Firebase
+- [ ] App update -> Firebase
+- [ ] Room db migration
 - [ ] Export/Import poems as csv
+
 
 ### V2
 Background

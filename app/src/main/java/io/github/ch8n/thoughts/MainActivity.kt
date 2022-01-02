@@ -20,11 +20,15 @@ import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.AppNavigator
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppDI.setAppContext(applicationContext)
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
         setContent {
             ThoughtsTheme {
                 // A surface container using the 'background' color from the theme

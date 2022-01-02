@@ -34,6 +34,7 @@ import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.theme.Hibiscus
 import io.github.ch8n.thoughts.ui.theme.Koromiko
+import timber.log.Timber
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -74,7 +75,7 @@ fun ProfileDialog(
                     ImagePicker.RESULT_ERROR -> {
                         val error = ImagePicker.getError(data)
                         setAvatarError.invoke(true)
-                        Log.e("image picker error", error)
+                        Timber.e("Avatar image picker error $error")
                     }
                     else -> {
                         val msg = "Task Cancelled"

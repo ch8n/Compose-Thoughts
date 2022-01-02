@@ -15,6 +15,7 @@ import io.github.ch8n.thoughts.ui.screen.home.HomeScreen
 import io.github.ch8n.thoughts.ui.screen.splash.Splash
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.FeelWithMeTemplate
 import io.github.ch8n.thoughts.ui.screen.template.feelswithMe.LeTemplateFeelWithMeTemplate
+import timber.log.Timber
 
 sealed class Screen {
     object Splash : Screen()
@@ -38,18 +39,12 @@ fun AppNavigator(splashScreen: Screen) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = backStack) {
-        Log.e(
-            "backstack",
-            "current -> ${backStack.map { it::class.simpleName }.joinToString(",")}"
-        )
+        Timber.e("backstack current -> ${backStack.map { it::class.simpleName }.joinToString()}")
     }
 
     fun onNavigationTo(screen: Screen) {
         setBackStack(backStack + screen)
-        Log.e(
-            "backstack",
-            "navigate ${screen::class.simpleName}"
-        )
+        Timber.e("backstack navigate ${screen::class.simpleName}")
     }
 
     fun onNavigationBack() {
@@ -60,10 +55,7 @@ fun AppNavigator(splashScreen: Screen) {
         } else {
             setBackStack(dropped)
         }
-        Log.e(
-            "backstack",
-            "onBack ${backStack.map { it::class.simpleName }.joinToString(",")}"
-        )
+        Timber.e("backstack onBack ${backStack.map { it::class.simpleName }.joinToString()}")
     }
 
     BackHandler {

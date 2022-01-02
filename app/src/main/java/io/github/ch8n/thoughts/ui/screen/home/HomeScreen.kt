@@ -52,6 +52,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 @Composable
@@ -365,13 +366,13 @@ class SharedViewModel(
                 }
             }
             .catch { error ->
-                Log.e("author", "error", error)
+                Timber.e("get author error $error")
             }
             .launchIn(viewModelScope)
 
         author.onEach { _author ->
             appRepo.getAllPoems(_author).catch { error ->
-                Log.e("getAllPoems", "error", error)
+                Timber.e("all poem error $error")
                 _allPoems.emit(emptyList())
                 _displayPoems.emit(emptyList())
             }.collect {
@@ -392,7 +393,7 @@ class SharedViewModel(
                 }
             }
         }.catch { error ->
-            Log.e("filterPoem", "error", error)
+            Timber.e("error filtering poem $error")
             _displayPoems.emit(_allPoems.value)
         }.launchIn(viewModelScope)
 
