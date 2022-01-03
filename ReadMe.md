@@ -19,16 +19,16 @@ A Jetpack Compose Poem writing application
 - [x] Crash Analytics -> Firebase
 - [x] App Performance -> Firebase
 - [x] Only dev logging -> Timber
-- [ ] Application icon
-- [ ] Notifications -> Firebase
-- [ ] App update -> Firebase
-- [ ] Room db migration
-- [ ] Export/Import poems as csv
-
+- [x] Application icon
 
 ### V2
 Background
 ---
+- [ ] Notifications -> Firebase
+- [ ] Export/Import poems as csv
+- [ ] Room db migration
+- [ ] App update -> Firebase
+- [ ] Export/Import poems as csv
 - [ ] Image blurring
 - [ ] Multiple Color Select
 - [ ] Color Gradient

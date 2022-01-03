@@ -1,6 +1,5 @@
 package io.github.ch8n.thoughts.ui.screen.editor
 
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -12,14 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import io.github.ch8n.thoughts.R
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
@@ -28,6 +23,7 @@ import io.github.ch8n.thoughts.ui.components.scaffolds.Preview
 import io.github.ch8n.thoughts.ui.navigation.Screen
 import io.github.ch8n.thoughts.ui.screen.home.SharedViewModel
 import io.github.ch8n.thoughts.ui.screen.template.TemplateSelectionDialog
+import io.github.ch8n.thoughts.ui.theme.Silver
 import io.github.ch8n.thoughts.ui.theme.ScarletGum
 import io.github.ch8n.thoughts.utils.toDate
 
@@ -156,7 +152,7 @@ fun EditorScreen(
                             Text(
                                 text = "Input Title...",
                                 style = MaterialTheme.typography.h1.copy(
-                                    color = Color.Gray
+                                    color = Silver
                                 ),
                             )
                         } else {
@@ -184,7 +180,7 @@ fun EditorScreen(
                             Text(
                                 text = "Write Something Amazing",
                                 style = MaterialTheme.typography.body1.copy(
-                                    color = Color.Gray
+                                    color = Silver
                                 ),
                             )
                         } else {
