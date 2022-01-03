@@ -3,11 +3,8 @@ package io.github.ch8n.thoughts.ui.screen.template
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -18,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -63,11 +61,20 @@ fun TemplateSelectionDialog(
                 .background(MaterialTheme.colors.background.copy(alpha = 0.4f))
         ) {
 
-
             Column(
                 modifier = Modifier
                     .fillMaxSize(0.8f)
                     .clip(MaterialTheme.shapes.large)
+                    .border(
+                        width = 1.5.dp,
+                        shape = MaterialTheme.shapes.large,
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Color.White,
+                                Color.Transparent,
+                            ),
+                        )
+                    )
                     .align(Alignment.Center)
                     .background(MaterialTheme.colors.surface),
             ) {

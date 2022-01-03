@@ -264,7 +264,16 @@ private fun PoemCard(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .border(0.5.dp, Color.White, MaterialTheme.shapes.large)
+            .border(
+                width = 1.5.dp,
+                shape = MaterialTheme.shapes.large,
+                brush = Brush.linearGradient(
+                    listOf(
+                        Color.White,
+                        Color.Transparent,
+                    ),
+                )
+            )
             .clickable { onPoemClicked.invoke(poem) },
         shape = MaterialTheme.shapes.large,
         backgroundColor = MaterialTheme.colors.background,

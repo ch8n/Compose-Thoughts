@@ -8,8 +8,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,103 +39,35 @@ fun EditorScreen(
     navigateTo: (Screen.Templates) -> Unit,
 ) {
     val sharedViewModel = AppDI.sharedViewModel
+
+
     val (header, setHeader) = remember { mutableStateOf(poem.title) }
     val (content, setContent) = remember { mutableStateOf(poem.content) }
-    val (info, setInfo) = remember { mutableStateOf("${System.currentTimeMillis().toDate()} | ${content.length} Words") }
-    val (isTemplateVisible, setTemplateVisible) = remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    BackHandler {
-        navigateBack.invoke()
+    val (info, setInfo) = remember { mutableStateOf(getContentInfo(content.length)) }
+    val (isTemplateSelectDialogVisible, setTemplateSelectDialogVisible) = remember {
+        mutableStateOf(
+            false
+        )
     }
+    val (isDeletePoemDialogVisible, setDeletePoemDialogVisible) = remember { mutableStateOf(false) }
+
+
+    BackHandler { navigateBack.invoke() }
 
     LaunchedEffect(key1 = content, header) {
         savePoem(header, content, sharedViewModel, poem)
-        setInfo.invoke(
-            "${System.currentTimeMillis().toDate()} | ${content.length} Words"
-        )
+        setInfo.invoke(getContentInfo(content.length))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                ScarletGum,
-                                Color.Transparent
-                            )
-                        )
-                    )
-                    .height(72.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .clickable {
-                            navigateBack()
-                        }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
-                        contentDescription = "",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Back",
-                        style = MaterialTheme.typography.button.copy(
-                            color = Color.White
-                        )
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                ) {
-
-                    IconButton(
-                        onClick = {
-                            sharedViewModel.deletePoem(poem)
-                            navigateBack.invoke()
-                        },
-                        modifier = Modifier.wrapContentSize()
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_delete),
-                            contentDescription = "",
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    IconButton(
-                        onClick = { setTemplateVisible.invoke(true) },
-                        modifier = Modifier.wrapContentSize()
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_share),
-                            contentDescription = "",
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-
-                }
-            }
+            Toolbar(
+                navigateBack = navigateBack,
+                setTemplateSelectDialogVisible = setTemplateSelectDialogVisible,
+                setDeleteDialogVisible = setDeletePoemDialogVisible
+            )
 
             Column(
                 modifier = Modifier
@@ -141,6 +76,10 @@ fun EditorScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
+
+                val (isHeaderFocused, setHeaderFocused) = remember { mutableStateOf(false) }
+                val (isContentFocused, setContentFocused) = remember { mutableStateOf(false) }
+
                 BasicTextField(
                     value = header,
                     onValueChange = setHeader,
@@ -148,17 +87,23 @@ fun EditorScreen(
                         color = Color.White,
                     ),
                     decorationBox = { innerTextField ->
-                        if (header.isEmpty()) {
-                            Text(
-                                text = "Input Title...",
-                                style = MaterialTheme.typography.h1.copy(
-                                    color = Silver
-                                ),
-                            )
-                        } else {
+                        Row {
+                            if (!isHeaderFocused && header.isEmpty()) {
+                                Text(
+                                    text = "Input Title...",
+                                    style = MaterialTheme.typography.h1.copy(
+                                        color = Silver
+                                    ),
+                                )
+                            }
                             innerTextField()
                         }
-                    }
+
+                    },
+                    modifier = Modifier.onFocusEvent {
+                        setHeaderFocused.invoke(it.isFocused)
+                    },
+                    cursorBrush = SolidColor(Color.White)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -176,37 +121,138 @@ fun EditorScreen(
                         lineHeight = 22.sp
                     ),
                     decorationBox = { innerTextField ->
-                        if (content.isEmpty()) {
-                            Text(
-                                text = "Write Something Amazing",
-                                style = MaterialTheme.typography.body1.copy(
-                                    color = Silver
-                                ),
-                            )
-                        } else {
+                        Row {
+                            if (!isContentFocused && content.isEmpty()) {
+                                Text(
+                                    text = "Write Something Amazing",
+                                    style = MaterialTheme.typography.body1.copy(
+                                        color = Silver
+                                    ),
+                                )
+                            }
                             innerTextField()
                         }
                     },
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .onFocusEvent {
+                            setContentFocused.invoke(it.isFocused)
+                        },
+                    cursorBrush = SolidColor(Color.White)
                 )
             }
 
         }
 
-        if (isTemplateVisible) {
+        if (isTemplateSelectDialogVisible) {
             TemplateSelectionDialog(
                 author = author,
                 poem = poem,
                 navigateBack = {
-                    setTemplateVisible.invoke(false)
+                    setTemplateSelectDialogVisible.invoke(false)
                 },
                 navigateTo = navigateTo
+            )
+        }
+
+        if (isDeletePoemDialogVisible) {
+            DeleteDialog(
+                onDialogDismiss = {
+                    setDeletePoemDialogVisible.invoke(false)
+                },
+                onDeleteConfirmed = {
+                    sharedViewModel.deletePoem(poem)
+                    navigateBack.invoke()
+                }
             )
         }
     }
 
 }
+
+@Composable
+private fun Toolbar(
+    navigateBack: () -> Unit,
+    setTemplateSelectDialogVisible: (Boolean) -> Unit,
+    setDeleteDialogVisible: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        ScarletGum,
+                        ScarletGum,
+                        Color.Transparent
+                    )
+                )
+            )
+            .height(72.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .clickable { navigateBack() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Back",
+                style = MaterialTheme.typography.button.copy(
+                    color = Color.White
+                )
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+        ) {
+
+            IconButton(
+                onClick = {
+                    setDeleteDialogVisible.invoke(true)
+                },
+                modifier = Modifier.wrapContentSize()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_delete),
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(
+                onClick = { setTemplateSelectDialogVisible.invoke(true) },
+                modifier = Modifier.wrapContentSize()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_share),
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+        }
+    }
+}
+
+private inline fun getContentInfo(contentLength: Int) =
+    "${System.currentTimeMillis().toDate()} | $contentLength Words"
 
 private fun savePoem(
     header: String,
@@ -215,7 +261,7 @@ private fun savePoem(
     poem: Poem
 ) {
     val isContentUpdated = header != poem.title || content != poem.content
-    if (isContentUpdated){
+    if (isContentUpdated) {
         sharedViewModel.saveOrUpdatePoem(
             poem.copy(
                 title = header,
@@ -226,13 +272,13 @@ private fun savePoem(
     }
 }
 
-@Preview
+
 @Composable
 fun EditorScreenPreview() {
     Preview {
         EditorScreen(
             author = Author.fake,
-            poem = Poem.fake,
+            poem = Poem.fake.copy(title = "", content = ""),
             navigateBack = {
 
             },
