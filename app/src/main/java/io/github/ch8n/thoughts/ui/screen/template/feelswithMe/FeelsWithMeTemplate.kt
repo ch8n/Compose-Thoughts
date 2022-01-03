@@ -7,7 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,11 +22,14 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
+import io.github.ch8n.thoughts.di.AppDI
+import io.github.ch8n.thoughts.ui.screen.editor.LoadingScaffold
+import io.github.ch8n.thoughts.utils.CaptureBitmap
 
 @Composable
 fun FeelWithMeContent(
-    poem: Poem,
     author: Author,
+    poem: Poem,
     modifier: Modifier,
 ) {
     Box(
@@ -75,16 +78,24 @@ fun FeelWithMeContent(
         }
 
     }
+
+
 }
 
 @Composable
-fun FeelWithMeTemplate(poem: Poem, author: Author) {
-    TemplateScaffold {
-        FeelWithMeContent(
-            poem = poem,
-            author = author,
-            modifier = Modifier.fillMaxSize()
-        )
+fun FeelWithMeTemplate(poemId: String, authorId: String) {
+    val sharedViewModel = AppDI.sharedViewModel
+    val author by sharedViewModel.author.collectAsState()
+    val poem by sharedViewModel.displayPoems.collectAsState()
+    val selectedPoem = poem.find { it.id == poemId }
+    LoadingScaffold(isLoading = selectedPoem == null) {
+        TemplateScaffold {
+            FeelWithMeContent(
+                author = author,
+                poem = requireNotNull(selectedPoem),
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 

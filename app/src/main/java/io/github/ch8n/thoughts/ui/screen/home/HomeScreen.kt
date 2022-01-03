@@ -419,7 +419,7 @@ class SharedViewModel(
     fun saveOrUpdatePoem(updatedPoem: Poem) {
         jobSavePoem?.cancel()
         jobSavePoem = viewModelScope.launch {
-            delay(500)
+            delay(300)
             appRepo.addPoem(updatedPoem)
         }
     }
@@ -430,6 +430,11 @@ class SharedViewModel(
         }
     }
 
+    fun createNewPoem(author: Author): String {
+        val newPoem = Poem(title = "", content = "", authorId = author.uid)
+        viewModelScope.launch { appRepo.addPoem(newPoem) }
+        return newPoem.id
+    }
 }
 
 @Composable
@@ -446,25 +451,12 @@ fun HomeScreen(
         HomeScreenRoot(
             author = author,
             poems = poems,
-            onSearch = { query ->
-                viewModel.filterPoem(query)
-            },
-            onPoemClicked = {
-                navigateTo(
-                    Screen.Editor(
-                        poem = it,
-                        author = author
-                    )
-                )
-            },
+            onSearch = { query -> viewModel.filterPoem(query) },
+            onPoemClicked = { navigateTo(Screen.Editor(authorId = author.uid, poemId = it.id)) },
             onProfileEditClicked = { setProfileVisible.invoke(true) },
             onCreateNewPoem = {
-                navigateTo(
-                    Screen.Editor(
-                        poem = Poem(title = "", content = "", authorId = author.uid),
-                        author = author
-                    )
-                )
+                val poemId = viewModel.createNewPoem(author)
+                navigateTo(Screen.Editor(authorId = author.uid, poemId = poemId))
             }
         )
         if (isProfileVisible) {

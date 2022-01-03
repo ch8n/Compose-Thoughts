@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import io.github.ch8n.thoughts.di.AppDI
 import io.github.ch8n.thoughts.ui.navigation.AppNavigator
 import io.github.ch8n.thoughts.ui.navigation.Screen
-import io.github.ch8n.thoughts.ui.screen.editor.EditorScreenPreview
 import io.github.ch8n.thoughts.ui.theme.ThoughtsTheme
 import io.github.ch8n.thoughts.utils.CrashReportingTree
 import timber.log.Timber
@@ -37,8 +36,7 @@ class MainActivity : ComponentActivity() {
             ThoughtsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    //AppNavigator(Screen.Splash)
-                    EditorScreenPreview()
+                    AppNavigator(Screen.Splash)
                 }
             }
         }

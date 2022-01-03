@@ -32,142 +32,189 @@ import io.github.ch8n.thoughts.utils.toDate
 
 
 @Composable
+fun LoadingScaffold(isLoading: Boolean, content: @Composable () -> Unit) {
+    if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
+            )
+        }
+    } else {
+        content.invoke()
+    }
+}
+
+@Composable
 fun EditorScreen(
-    author: Author,
-    poem: Poem,
+    authorId: String,
+    poemId: String,
     navigateBack: () -> Unit,
     navigateTo: (Screen.Templates) -> Unit,
 ) {
+
     val sharedViewModel = AppDI.sharedViewModel
-
-
-    val (header, setHeader) = remember { mutableStateOf(poem.title) }
-    val (content, setContent) = remember { mutableStateOf(poem.content) }
-    val (info, setInfo) = remember { mutableStateOf(getContentInfo(content.length)) }
-    val (isTemplateSelectDialogVisible, setTemplateSelectDialogVisible) = remember {
-        mutableStateOf(
-            false
-        )
-    }
-    val (isDeletePoemDialogVisible, setDeletePoemDialogVisible) = remember { mutableStateOf(false) }
-
-
-    BackHandler { navigateBack.invoke() }
-
-    LaunchedEffect(key1 = content, header) {
-        savePoem(header, content, sharedViewModel, poem)
-        setInfo.invoke(getContentInfo(content.length))
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Toolbar(
-                navigateBack = navigateBack,
-                setTemplateSelectDialogVisible = setTemplateSelectDialogVisible,
-                setDeleteDialogVisible = setDeletePoemDialogVisible
+    val author by sharedViewModel.author.collectAsState()
+    val poem by sharedViewModel.displayPoems.collectAsState()
+    val selectedPoem = poem.find { it.id == poemId }
+    LoadingScaffold(isLoading = selectedPoem == null) {
+        val (updatedPoem, setUpdatedPoem) = remember {
+            mutableStateOf<Poem>(
+                requireNotNull(
+                    selectedPoem
+                )
             )
+        }
+        val (info, setInfo) = remember { mutableStateOf(updatedPoem.getContentInfo()) }
 
+        val (isTemplateSelectDialogVisible, setTemplateSelectDialogVisible) = remember {
+            mutableStateOf(false)
+        }
+
+        val (isDeletePoemDialogVisible, setDeletePoemDialogVisible) = remember {
+            mutableStateOf(false)
+        }
+
+        BackHandler { navigateBack.invoke() }
+
+        LaunchedEffect(key1 = updatedPoem) {
+            sharedViewModel.saveOrUpdatePoem(updatedPoem)
+            setInfo.invoke(updatedPoem.getContentInfo())
+        }
+
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .verticalScroll(rememberScrollState())
+                modifier = Modifier.fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                val (isHeaderFocused, setHeaderFocused) = remember { mutableStateOf(false) }
-                val (isContentFocused, setContentFocused) = remember { mutableStateOf(false) }
-
-                BasicTextField(
-                    value = header,
-                    onValueChange = setHeader,
-                    textStyle = MaterialTheme.typography.h1.copy(
-                        color = Color.White,
-                    ),
-                    decorationBox = { innerTextField ->
-                        Row {
-                            if (!isHeaderFocused && header.isEmpty()) {
-                                Text(
-                                    text = "Input Title...",
-                                    style = MaterialTheme.typography.h1.copy(
-                                        color = Silver
-                                    ),
-                                )
-                            }
-                            innerTextField()
-                        }
-
-                    },
-                    modifier = Modifier.onFocusEvent {
-                        setHeaderFocused.invoke(it.isFocused)
-                    },
-                    cursorBrush = SolidColor(Color.White)
+                Toolbar(
+                    navigateBack = navigateBack,
+                    setTemplateSelectDialogVisible = setTemplateSelectDialogVisible,
+                    setDeleteDialogVisible = setDeletePoemDialogVisible
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = info,
-                    style = MaterialTheme.typography.caption.copy(
-                        color = Color.White
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                BasicTextField(
-                    value = content,
-                    onValueChange = setContent,
-                    textStyle = MaterialTheme.typography.body1.copy(
-                        color = Color.White,
-                        lineHeight = 22.sp
-                    ),
-                    decorationBox = { innerTextField ->
-                        Row {
-                            if (!isContentFocused && content.isEmpty()) {
-                                Text(
-                                    text = "Write Something Amazing",
-                                    style = MaterialTheme.typography.body1.copy(
-                                        color = Silver
-                                    ),
-                                )
-                            }
-                            innerTextField()
-                        }
-                    },
+
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .onFocusEvent {
-                            setContentFocused.invoke(it.isFocused)
-                        },
-                    cursorBrush = SolidColor(Color.White)
+                        .padding(horizontal = 24.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    HeaderTextField(
+                        updatedPoem = updatedPoem,
+                        setUpdatedPoem = setUpdatedPoem
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = info,
+                        style = MaterialTheme.typography.caption.copy(
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ContentTextField(
+                        updatedPoem = updatedPoem,
+                        setUpdatedPoem = setUpdatedPoem
+                    )
+                }
+
+            }
+
+            if (isTemplateSelectDialogVisible) {
+                TemplateSelectionDialog(
+                    authorId = authorId,
+                    poemId = poemId,
+                    navigateBack = {
+                        setTemplateSelectDialogVisible.invoke(false)
+                    },
+                    navigateTo = navigateTo
                 )
             }
 
-        }
-
-        if (isTemplateSelectDialogVisible) {
-            TemplateSelectionDialog(
-                author = author,
-                poem = poem,
-                navigateBack = {
-                    setTemplateSelectDialogVisible.invoke(false)
-                },
-                navigateTo = navigateTo
-            )
-        }
-
-        if (isDeletePoemDialogVisible) {
-            DeleteDialog(
-                onDialogDismiss = {
-                    setDeletePoemDialogVisible.invoke(false)
-                },
-                onDeleteConfirmed = {
-                    sharedViewModel.deletePoem(poem)
-                    navigateBack.invoke()
-                }
-            )
+            if (isDeletePoemDialogVisible) {
+                DeleteDialog(
+                    onDialogDismiss = {
+                        setDeletePoemDialogVisible.invoke(false)
+                    },
+                    onDeleteConfirmed = {
+                        sharedViewModel.deletePoem(requireNotNull(selectedPoem))
+                        navigateBack.invoke()
+                    }
+                )
+            }
         }
     }
+}
 
+@Composable
+private fun ContentTextField(
+    updatedPoem: Poem,
+    setUpdatedPoem: (Poem) -> Unit
+) {
+    val (isContentFocused, setContentFocused) = remember { mutableStateOf(false) }
+    BasicTextField(
+        value = updatedPoem.content,
+        onValueChange = {
+            setUpdatedPoem.invoke(updatedPoem.copy(content = it))
+        },
+        textStyle = MaterialTheme.typography.body1.copy(
+            color = Color.White,
+            lineHeight = 22.sp
+        ),
+        decorationBox = { innerTextField ->
+            Row {
+                if (!isContentFocused && updatedPoem.content.isEmpty()) {
+                    Text(
+                        text = "Write Something Amazing",
+                        style = MaterialTheme.typography.body1.copy(
+                            color = Silver
+                        ),
+                    )
+                }
+                innerTextField()
+            }
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .onFocusEvent {
+                setContentFocused.invoke(it.isFocused)
+            },
+        cursorBrush = SolidColor(Color.White)
+    )
+}
+
+@Composable
+private fun HeaderTextField(
+    updatedPoem: Poem,
+    setUpdatedPoem: (Poem) -> Unit
+) {
+    val (isHeaderFocused, setHeaderFocused) = remember { mutableStateOf(false) }
+    BasicTextField(
+        value = updatedPoem.title,
+        onValueChange = {
+            setUpdatedPoem.invoke(updatedPoem.copy(title = it))
+        },
+        textStyle = MaterialTheme.typography.h1.copy(
+            color = Color.White,
+        ),
+        decorationBox = { innerTextField ->
+            Row {
+                if (!isHeaderFocused && updatedPoem.title.isEmpty()) {
+                    Text(
+                        text = "Input Title...",
+                        style = MaterialTheme.typography.h1.copy(
+                            color = Silver
+                        ),
+                    )
+                }
+                innerTextField()
+            }
+        },
+        modifier = Modifier.onFocusEvent {
+            setHeaderFocused.invoke(it.isFocused)
+        },
+        cursorBrush = SolidColor(Color.White)
+    )
 }
 
 @Composable
@@ -251,40 +298,4 @@ private fun Toolbar(
     }
 }
 
-private inline fun getContentInfo(contentLength: Int) =
-    "${System.currentTimeMillis().toDate()} | $contentLength Words"
-
-private fun savePoem(
-    header: String,
-    content: String,
-    sharedViewModel: SharedViewModel,
-    poem: Poem
-) {
-    val isContentUpdated = header != poem.title || content != poem.content
-    if (isContentUpdated) {
-        sharedViewModel.saveOrUpdatePoem(
-            poem.copy(
-                title = header,
-                content = content,
-                updatedAt = System.currentTimeMillis()
-            )
-        )
-    }
-}
-
-
-@Composable
-fun EditorScreenPreview() {
-    Preview {
-        EditorScreen(
-            author = Author.fake,
-            poem = Poem.fake.copy(title = "", content = ""),
-            navigateBack = {
-
-            },
-            navigateTo = {
-
-            }
-        )
-    }
-}
+private inline fun Poem.getContentInfo() = "${updatedAt.toDate()} | ${content.length} Words"

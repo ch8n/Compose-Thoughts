@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,21 +24,28 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import io.github.ch8n.thoughts.data.db.Author
 import io.github.ch8n.thoughts.data.db.Poem
+import io.github.ch8n.thoughts.di.AppDI
+import io.github.ch8n.thoughts.ui.screen.editor.LoadingScaffold
 
 @Composable
 fun LeTemplateFeelWithMeTemplate(
-    poem: Poem,
-    author: Author,
+    poemId: String,
+    authorId: String
 ) {
-    TemplateScaffold {
-        LeTemplateFeelWithMeContent(
-            poem = poem,
-            author = author,
-            modifier = Modifier
-                .fillMaxSize()
-        )
+    val sharedViewModel = AppDI.sharedViewModel
+    val author by sharedViewModel.author.collectAsState()
+    val poem by sharedViewModel.displayPoems.collectAsState()
+    val selectedPoem = poem.find { it.id == poemId }
+    LoadingScaffold(isLoading = selectedPoem == null) {
+        TemplateScaffold {
+            LeTemplateFeelWithMeContent(
+                poem = requireNotNull(selectedPoem),
+                author = author,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        }
     }
-
 }
 
 @Composable

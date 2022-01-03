@@ -34,16 +34,16 @@ import io.github.ch8n.thoughts.ui.navigation.Screen
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TemplateSelectionDialog(
-    author: Author,
-    poem: Poem,
+    authorId: String,
+    poemId: String,
     navigateBack: () -> Unit,
     navigateTo: (Screen.Templates) -> Unit
 ) {
 
     val templates = remember {
         listOf(
-            Screen.Templates.LeThoughtDefault(author, poem),
-            Screen.Templates.FeelWithMe(author, poem),
+            Screen.Templates.LeThoughtDefault(authorId = authorId, poemId = poemId),
+            Screen.Templates.FeelWithMe(authorId = authorId, poemId = poemId),
         )
     }
 
@@ -138,23 +138,5 @@ fun TemplateSelectionDialog(
                 }
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun TemplateSelectionDialogPreview() {
-    Preview {
-        TemplateSelectionDialog(
-            author = Author.fake,
-            poem = Poem.fake,
-            navigateBack = {
-
-            },
-            navigateTo = {
-
-            }
-        )
     }
 }
