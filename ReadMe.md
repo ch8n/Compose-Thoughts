@@ -1,8 +1,29 @@
 # [Compose-Thoughts]
 A Jetpack Compose Poem writing application
+---
+<img src="./assets/feature"/>
 
 ## Inspiration
 > A friend writes Poem, Its an application for ease writing and designing process.
+
+## Playstore Assets
+<table>
+  <tr>
+    <td>
+        <img src="./assets/preview1" height=400px/>
+    </td>
+    <td>
+        <img src="./assets/preview2" height=400px/>
+    </td>
+    <td>
+        <img src="./assets/preview3" height=400px/>
+    </td>
+    <td>
+            <img src="./assets/preview4" height=400px/>
+        </td>
+  </tr>
+
+</table>
 
 ## Preview V1
 <table>
