@@ -82,7 +82,8 @@
 ### V2
 
 ## Background
-
+- [ ] Create Template 
+- [ ] Save Template
 - [ ] Notifications -> Firebase
 - [ ] Export/Import poems as csv
 - [ ] Room db migration
