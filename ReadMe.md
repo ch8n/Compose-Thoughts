@@ -1,65 +1,71 @@
 # [Compose-Thoughts]
-A Jetpack Compose Poem writing application
----
-<img src="./assets/feature"/>
+
+## A Jetpack Compose Poem writing application
+
+<img src="./assets/feature.jpg"/>
 
 ## Inspiration
+
 > A friend writes Poem, Its an application for ease writing and designing process.
 
 ## Playstore Assets
+
 <table>
   <tr>
     <td>
-        <img src="./assets/preview1" height=400px/>
+        <img src="assets/preview1.jpg" height=400px/>
     </td>
     <td>
-        <img src="./assets/preview2" height=400px/>
+        <img src="./assets/preview2.jpg" height=400px/>
     </td>
-    <td>
-        <img src="./assets/preview3" height=400px/>
-    </td>
-    <td>
-            <img src="./assets/preview4" height=400px/>
-        </td>
   </tr>
-
+  <tr>
+    <td>
+        <img src="./assets/preview3.jpg" height=400px/>
+    </td>
+    <td>
+        <img src="./assets/preview4.jpg" height=400px/>
+    </td>
+  </tr>
 </table>
 
 ## Preview V1
+
 <table>
   <tr>
     <td>
-        <img src="./assets/preview_1" height=400px/>
+        <img src="./assets/preview_1.png" height=400px/>
     </td>
     <td>
-        <img src="./assets/preview_2" height=400px/>
+        <img src="./assets/preview_2.png" height=400px/>
     </td>
     <td>
-        <img src="./assets/preview_3" height=400px/>
+        <img src="./assets/preview_3.png" height=400px/>
     </td>
   </tr>
 
   <tr>
       <td>
-          <img src="./assets/preview_4" height=400px/>
+          <img src="./assets/preview_4.png" height=400px/>
       </td>
       <td>
-          <img src="./assets/preview_5" height=400px/>
+          <img src="./assets/preview_5.png" height=400px/>
       </td>
       <td>
-          <img src="./assets/preview_6" height=400px/>
+          <img src="./assets/preview_6.png" height=400px/>
       </td>
     </tr>
     <tr>
         <td>
-            <img src="./assets/preview_7" height=400px/>
+            <img src="./assets/preview_7.png" height=400px/>
         </td>
     </tr>
 </table>
 
-
 ## Features
+
 ### V1
+
 - [x] Write poem
 - [x] Pick solid color - Black
 - [x] Pick Text color - White
@@ -74,8 +80,9 @@ A Jetpack Compose Poem writing application
 - [x] Application icon
 
 ### V2
-Background
----
+
+## Background
+
 - [ ] Notifications -> Firebase
 - [ ] Export/Import poems as csv
 - [ ] Room db migration
@@ -86,59 +93,56 @@ Background
 - [ ] Color Gradient
 - [ ] share image from resolution
 
-Fonts
----
+## Fonts
+
 - [ ] Multiple Font Preview
 - [ ] Styles - Underline, Bold, Italic, Normal
 - [ ] Alignment - left, right, center
 - [ ] Text Colors
 
-Sound
----
+## Sound
+
 - [ ] Voice to text
 - [ ] Narrate Mode -> record quote 1 min max
 - [ ] background music picker 1 min max
 - [ ] sound cropper | Selector and Preview
 - [ ] Export as MP4
 
-Overlay
----
+## Overlay
+
 - [ ] Add images as overlay
 - [ ] image blend mode
 - [ ] alpha control
 
 ### V3
+
 Social Platform
+
 - [ ] Share Feeds
 - [ ] Like | Dislike
 - [ ] Follow | share
 
-Security
----
-- [ ]  removed support for links
+## Security
 
-
-
-
-
-
-
-
+- [ ] removed support for links
 
 ## Blog and Portfolio @ [Chetangupta.net](https://chetangupta.net/about)
 
 ## Built With 🛠
+
 - [Kotlin](https://kotlinlang.org/) official programming language for Android development.
 - [Jetpack Compose](https://developer.android.com/jetpack/compose) Android’s modern toolkit for building native UI.
 
 ## Build-tool 🧰
+
 You need to have [Android Studio](https://developer.android.com/studio) to build this project.
 
 ## :eyes: Social
+
 [LinkedIn](https://bit.ly/ch8n-linkdIn) | [Medium](https://bit.ly/ch8n-medium-blog) | [Twitter](https://bit.ly/ch8n-twitter) | [StackOverflow](https://bit.ly/ch8n-stackOflow) | [CodeWars](https://bit.ly/ch8n-codewar) | [Portfolio](https://bit.ly/ch8n-home) | [Github](https://bit.ly/ch8n-git) | [Instagram](https://bit.ly/ch8n-insta) | [Youtube](https://bit.ly/ch8n-youtube)
 
-
 ## :cop: License
+
 ```
 # MIT License
 
