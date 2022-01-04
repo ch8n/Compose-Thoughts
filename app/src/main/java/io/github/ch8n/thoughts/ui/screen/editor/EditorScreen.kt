@@ -155,7 +155,7 @@ private fun ContentTextField(
     BasicTextField(
         value = updatedPoem.content,
         onValueChange = {
-            setUpdatedPoem.invoke(updatedPoem.copy(content = it))
+            setUpdatedPoem.invoke(updatedPoem.copy(content = it, updatedAt = System.currentTimeMillis()))
         },
         textStyle = MaterialTheme.typography.body1.copy(
             color = Color.White,
@@ -192,7 +192,7 @@ private fun HeaderTextField(
     BasicTextField(
         value = updatedPoem.title,
         onValueChange = {
-            setUpdatedPoem.invoke(updatedPoem.copy(title = it))
+            setUpdatedPoem.invoke(updatedPoem.copy(title = it, updatedAt = System.currentTimeMillis()))
         },
         textStyle = MaterialTheme.typography.h1.copy(
             color = Color.White,

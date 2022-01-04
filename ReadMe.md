@@ -4,7 +4,38 @@ A Jetpack Compose Poem writing application
 ## Inspiration
 > A friend writes Poem, Its an application for ease writing and designing process.
 
-## Preview (Development in Process)
+## Preview V1
+<table>
+  <tr>
+    <td>
+        <img src="./assets/preview_1" height=400px/>
+    </td>
+    <td>
+        <img src="./assets/preview_2" height=400px/>
+    </td>
+    <td>
+        <img src="./assets/preview_3" height=400px/>
+    </td>
+  </tr>
+
+  <tr>
+      <td>
+          <img src="./assets/preview_4" height=400px/>
+      </td>
+      <td>
+          <img src="./assets/preview_5" height=400px/>
+      </td>
+      <td>
+          <img src="./assets/preview_6" height=400px/>
+      </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="./assets/preview_7" height=400px/>
+        </td>
+    </tr>
+</table>
+
 
 ## Features
 ### V1
