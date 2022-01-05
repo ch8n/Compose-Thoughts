@@ -46,7 +46,7 @@ fun AppNavigator(splashScreen: Screen) {
 
     fun onNavigationBack() {
         val dropped = backStack.dropLast(1)
-        val isSplashScreen = dropped.last() == splashScreen
+        val isSplashScreen = dropped.isEmpty() || dropped.lastOrNull() == splashScreen
         if (isSplashScreen) {
             (context as Activity).finish()
         } else {
