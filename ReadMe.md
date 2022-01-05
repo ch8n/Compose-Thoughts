@@ -6,7 +6,7 @@
 
 ## Inspiration
 
-> A friend writes Poem, Its an application for ease writing and designing process.
+> My friend [TheDroidCoder](https://twitter.com/theDroidCoder) writes lots of Quotes, Its an application for ease writing and designing process.
 
 ## Playstore Assets
 
